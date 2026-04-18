@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoxelMD — Profile</title>
+<script>if(localStorage.getItem('voxelTheme')==='dark')document.documentElement.className='dark';</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F6F3;
+  --surface: #fff;
+  --surface2: #F0EFEB;
+  --border: rgba(0,0,0,0.08);
+  --border-md: rgba(0,0,0,0.13);
+  --text: #1A1A1A;
+  --text-2: #6B6B6B;
+  --text-3: #ADADAD;
+  --teal: #1D9E75;
+  --teal-light: #E1F5EE;
+  --teal-mid: #5DCAA5;
+  --teal-dark: #179164;
+  --amber: #BA7517;
+  --red: #D94040;
+  --purple: #534AB7;
+  --purple-light: #EEEDFE;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+html.dark {
+  --bg: #1C1B19;
+  --surface: #242321;
+  --surface2: #2E2C2A;
+  --border: rgba(255,255,255,0.07);
+  --border-md: rgba(255,255,255,0.12);
+  --text: #E8E6E1;
+  --text-2: #9A9891;
+  --text-3: #575451;
+  --teal-light: rgba(29,158,117,0.18);
+  --purple-light: rgba(83,74,183,0.18);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100%; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.back-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--text-2); padding: 5px 8px;
+  border-radius: var(--radius);
+  transition: background 0.12s, color 0.12s;
+}
+.back-btn:hover { background: var(--surface2); color: var(--teal); }
+.back-btn svg { width: 14px; height: 14px; }
+.page-header-sep { width: 1px; height: 16px; background: var(--border-md); }
+.page-header-title { font-size: 14px; font-weight: 500; color: var(--text); }
+
+/* ── PAGE CONTENT ── */
+.page-content {
+  max-width: 660px;
+  margin: 36px auto 60px;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.card-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.card-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.card-subtitle { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.card-body { padding: 20px; }
+
+/* ── PROFILE ── */
+.profile-row { display: flex; align-items: flex-start; gap: 20px; }
+.avatar-block {
+  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.avatar-lg {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: var(--purple-light);
+  color: var(--purple);
+  font-size: 22px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; cursor: pointer;
+  border: 2px solid var(--border-md);
+  transition: border-color 0.15s;
+  position: relative;
+}
+.avatar-lg:hover { border-color: var(--teal-mid); }
+.avatar-lg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.avatar-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; border-radius: 50%;
+  transition: opacity 0.15s;
+}
+.avatar-overlay svg { width: 18px; height: 18px; color: white; }
+.avatar-lg:hover .avatar-overlay { opacity: 1; }
+.avatar-hint { font-size: 10px; color: var(--text-3); text-align: center; line-height: 1.4; }
+
+.profile-fields { flex: 1; display: flex; flex-direction: column; gap: 13px; }
+.field-group { display: flex; flex-direction: column; gap: 5px; }
+.field-label { font-size: 11px; font-weight: 500; color: var(--text-2); }
+.field-input {
+  font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+  background: var(--bg); border: 1px solid var(--border-md);
+  border-radius: var(--radius); padding: 8px 11px; outline: none;
+  transition: border-color 0.12s;
+}
+.field-input:focus { border-color: var(--teal-mid); }
+.field-input[readonly] { color: var(--text-3); cursor: default; background: var(--surface2); }
+html.dark .field-input { background: var(--surface2); }
+html.dark .field-input:focus { background: var(--surface); }
+html.dark .field-input[readonly] { background: var(--bg); }
+
+.profile-save-row { display: flex; justify-content: flex-end; margin-top: 2px; }
+.btn-primary {
+  padding: 7px 16px;
+  background: var(--teal); color: white; border: none;
+  border-radius: var(--radius); font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: background 0.12s;
+}
+.btn-primary:hover { background: var(--teal-dark); }
+.btn-primary:disabled { opacity: 0.45; cursor: default; }
+
+/* ── PLAN ── */
+.plan-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--teal-light); color: var(--teal);
+  border: 1px solid rgba(29,158,117,0.22);
+  border-radius: 20px; padding: 3px 11px;
+  font-size: 12px; font-weight: 500; margin-bottom: 16px;
+}
+.plan-badge svg { width: 11px; height: 11px; }
+
+.plan-limits {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.plan-limit-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.plan-limit-row:last-child { border-bottom: none; }
+.plan-limit-icon {
+  width: 28px; height: 28px;
+  border-radius: 7px; background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.plan-limit-icon svg { width: 13px; height: 13px; color: var(--text-2); }
+.plan-limit-label { flex: 1; color: var(--text-2); font-size: 13px; }
+.plan-limit-value {
+  font-size: 12px; font-weight: 500; color: var(--text);
+  font-family: 'DM Mono', monospace; text-align: right;
+}
+.plan-limit-value.unlimited { color: var(--teal); font-family: 'DM Sans', sans-serif; }
+.plan-limit-value.warn { color: var(--amber); }
+.plan-limit-value.danger { color: var(--red); }
+.plan-limit-unit { font-weight: 400; color: var(--text-3); font-size: 11px; margin-left: 2px; }
+
+.usage-bar {
+  height: 3px; background: var(--surface2); border-radius: 2px;
+  margin-top: 6px; overflow: hidden; width: 64px;
+}
+.usage-bar-fill {
+  height: 100%; border-radius: 2px; background: var(--teal);
+  transition: width 0.5s ease;
+}
+.usage-bar-fill.warn { background: var(--amber); }
+.usage-bar-fill.danger { background: var(--red); }
+
+.plan-desc {
+  font-size: 12px; color: var(--text-3); line-height: 1.65;
+  margin-bottom: 18px;
+}
+
+.btn-upgrade {
+  width: 100%; padding: 10px 14px;
+  background: var(--surface2); color: var(--text-3);
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500;
+  cursor: not-allowed;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-upgrade svg { width: 13px; height: 13px; }
+.upgrade-tag {
+  font-size: 10px; font-weight: 400;
+  background: var(--surface); color: var(--text-3);
+  border: 1px solid var(--border-md);
+  border-radius: 10px; padding: 2px 8px;
+}
+
+/* ── ABOUT ── */
+.about-intro {
+  font-size: 13px; color: var(--text-2); line-height: 1.7;
+  margin-bottom: 16px;
+}
+.about-intro strong { color: var(--teal); font-weight: 600; }
+.about-version-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 18px;
+}
+.about-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--purple-light); color: var(--purple);
+  border: 1px solid rgba(83,74,183,0.2);
+  border-radius: 20px; padding: 3px 11px;
+  font-size: 11px; font-weight: 500;
+}
+.about-badge svg { width: 11px; height: 11px; }
+.about-stage {
+  font-size: 11px; color: var(--text-3);
+}
+.bug-label {
+  font-size: 11px; font-weight: 500; color: var(--text-2);
+  display: block; margin-bottom: 7px;
+}
+.bug-textarea {
+  width: 100%;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+  background: var(--bg); border: 1px solid var(--border-md);
+  border-radius: var(--radius); padding: 10px 12px;
+  resize: vertical; min-height: 88px; outline: none;
+  transition: border-color 0.12s; line-height: 1.6;
+}
+.bug-textarea:focus { border-color: var(--teal-mid); }
+html.dark .bug-textarea { background: var(--surface2); }
+html.dark .bug-textarea:focus { background: var(--surface); }
+.bug-submit-row { display: flex; justify-content: flex-end; margin-top: 10px; }
+.btn-secondary {
+  padding: 7px 16px;
+  background: var(--surface2); color: var(--text-2);
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius); font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.btn-secondary:hover { background: var(--border); color: var(--text); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: white; font-size: 13px;
+  padding: 8px 16px; border-radius: 20px;
+  opacity: 0; transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none; z-index: 999; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ── PAGE HEADER ── -->
+<div class="page-header">
+  <button class="back-btn" id="backBtn">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <polyline points="10,4 6,8 10,12"/>
+    </svg>
+    Back
+  </button>
+  <div class="page-header-sep"></div>
+  <span class="page-header-title">Profile &amp; Settings</span>
+</div>
+
+<!-- ── PAGE CONTENT ── -->
+<div class="page-content">
+
+  <!-- Profile Card -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Profile</div>
+      <div class="card-subtitle">Update your display name and avatar</div>
+    </div>
+    <div class="card-body">
+      <div class="profile-row">
+
+        <div class="avatar-block">
+          <div class="avatar-lg" id="avatarLg">
+            <span id="avatarInitials"></span>
+            <div class="avatar-overlay">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M13 10v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2"/>
+                <polyline points="5,6 8,3 11,6"/>
+                <line x1="8" y1="3" x2="8" y2="10"/>
+              </svg>
+            </div>
+          </div>
+          <div class="avatar-hint">Click to<br>change</div>
+          <input type="file" id="avatarInput" accept="image/*" style="display:none">
+        </div>
+
+        <div class="profile-fields">
+          <div class="field-group">
+            <label class="field-label" for="profileName">Display Name</label>
+            <input type="text" class="field-input" id="profileName" placeholder="Your name" maxlength="40">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="profileEmail">Email</label>
+            <input type="text" class="field-input" id="profileEmail" readonly>
+          </div>
+          <div class="profile-save-row">
+            <button class="btn-primary" id="saveProfileBtn" disabled>Save Changes</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan Card -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Subscription Plan</div>
+      <div class="card-subtitle">Your current plan and usage limits</div>
+    </div>
+    <div class="card-body">
+
+      <div class="plan-badge">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <polygon points="8,1 10,6 15,6 11,9.5 12.5,15 8,12 3.5,15 5,9.5 1,6 6,6"/>
+        </svg>
+        Free Plan
+      </div>
+
+      <div class="plan-limits">
+        <div class="plan-limit-row">
+          <div class="plan-limit-icon">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+              <rect x="1" y="1" width="6" height="6" rx="1"/>
+              <rect x="9" y="1" width="6" height="6" rx="1"/>
+              <rect x="1" y="9" width="6" height="6" rx="1"/>
+              <rect x="9" y="9" width="6" height="6" rx="1"/>
+            </svg>
+          </div>
+          <span class="plan-limit-label">Workspaces</span>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <span class="plan-limit-value" id="usageWs">—<span class="plan-limit-unit">/5</span></span>
+            <div class="usage-bar"><div class="usage-bar-fill" id="barWs" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="plan-limit-row">
+          <div class="plan-limit-icon">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+              <path d="M13 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V3a1 1 0 00-1-1z"/>
+              <line x1="5" y1="6" x2="11" y2="6"/>
+              <line x1="5" y1="9" x2="9" y2="9"/>
+            </svg>
+          </div>
+          <span class="plan-limit-label">Articles per workspace</span>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
+            <span class="plan-limit-value" id="usageArticles">—</span>
+            <span class="plan-limit-unit" style="font-size:11px;color:var(--teal);">Unlimited</span>
+          </div>
+        </div>
+        <div class="plan-limit-row">
+          <div class="plan-limit-icon">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+              <rect x="1" y="3" width="14" height="10" rx="1.5"/>
+              <circle cx="5.5" cy="7" r="1.5"/>
+              <polyline points="1,11 5,8 8,10 11,7 15,10"/>
+            </svg>
+          </div>
+          <span class="plan-limit-label">Photo uploads</span>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <span class="plan-limit-value" id="usagePhotos">—<span class="plan-limit-unit">/20</span></span>
+            <div class="usage-bar"><div class="usage-bar-fill" id="barPhotos" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="plan-limit-row">
+          <div class="plan-limit-icon">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+              <rect x="1" y="3" width="10" height="10" rx="1.5"/>
+              <polyline points="11,6 15,4 15,12 11,10"/>
+            </svg>
+          </div>
+          <span class="plan-limit-label">Video uploads</span>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <span class="plan-limit-value" id="usageVideos">—<span class="plan-limit-unit">/5</span></span>
+            <div class="usage-bar"><div class="usage-bar-fill" id="barVideos" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="plan-limit-row">
+          <div class="plan-limit-icon">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+              <circle cx="8" cy="4" r="2.5"/>
+              <path d="M3.5 4.5A4.5 4.5 0 008 9a4.5 4.5 0 004.5-4.5"/>
+              <line x1="8" y1="9" x2="8" y2="13"/>
+              <line x1="5.5" y1="13" x2="10.5" y2="13"/>
+            </svg>
+          </div>
+          <span class="plan-limit-label">Recording uploads</span>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <span class="plan-limit-value" id="usageRec">—<span class="plan-limit-unit">/20</span></span>
+            <div class="usage-bar"><div class="usage-bar-fill" id="barRec" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="plan-desc">
+        The Free plan gives you full access to all reading and listening practice features.
+        Upgrade to Pro for unlimited media storage, advanced analytics, and priority TTS processing.
+      </p>
+
+      <button class="btn-upgrade" disabled>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+          <polyline points="8,11 8,4"/>
+          <polyline points="5,7 8,4 11,7"/>
+          <line x1="3" y1="13" x2="13" y2="13"/>
+        </svg>
+        Upgrade to Pro
+        <span class="upgrade-tag">Opens after Beta 2.0</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- About VoxelMD Card -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">About VoxelMD</div>
+      <div class="card-subtitle">Project info &amp; feedback</div>
+    </div>
+    <div class="card-body">
+
+      <div class="about-version-row">
+        <div class="about-badge">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="8" cy="8" r="6.5"/>
+            <line x1="8" y1="5" x2="8" y2="8.5"/>
+            <circle cx="8" cy="11" r="0.6" fill="currentColor" stroke="none"/>
+          </svg>
+          Beta 1.0
+        </div>
+        <span class="about-stage">Early access — features may change</span>
+      </div>
+
+      <p class="about-intro">
+        <strong>VoxelMD</strong> is an English speaking practice platform built for learners who want to
+        improve pronunciation and fluency through real-world reading material.
+        Paste any Markdown article, listen to AI-generated narration via <strong>Kokoro TTS</strong>,
+        record yourself reading aloud, and compare your recording side-by-side with the reference audio.
+        Build a personal vocabulary dictionary from words you encounter as you go.
+      </p>
+      <p class="about-intro" style="margin-top:-6px;">
+        We're currently in <strong>Beta 1.0</strong>. Sharing, team workspaces, analytics dashboards,
+        and Pro subscription tiers are on the roadmap for <strong>Beta 2.0</strong>.
+        Your feedback helps us prioritize what ships next.
+      </p>
+
+      <label class="bug-label" for="bugTextarea">Report a bug or share feedback</label>
+      <textarea class="bug-textarea" id="bugTextarea" placeholder="Describe what happened, which page you were on, and any steps to reproduce…"></textarea>
+      <div class="bug-submit-row">
+        <button class="btn-secondary" id="bugSubmitBtn">Send Feedback</button>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- .page-content -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── TOAST ──
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2400);
+}
+
+// ── USAGE ──
+function loadUsage() {
+  // Workspaces — from voxelWorkspaces (saved by home.html)
+  var wsRaw = localStorage.getItem('voxelWorkspaces');
+  var wsCount = wsRaw ? JSON.parse(wsRaw).length : 0;
+  var wsArticles = wsRaw ? JSON.parse(wsRaw).reduce(function(a, w) { return a + (w.articles || 0); }, 0) : 0;
+
+  // Media — from voxelMedia (saved by both pages)
+  var mediaRaw = localStorage.getItem('voxelMedia');
+  var media = mediaRaw ? JSON.parse(mediaRaw) : [];
+  var photoCount = media.filter(function(m) { return m.type === 'photo'; }).length;
+  var videoCount = media.filter(function(m) { return m.type === 'video'; }).length;
+
+  // Recordings — not yet persisted to localStorage in this demo; show 0
+  var recCount = 0;
+
+  setUsage('usageWs', 'barWs', wsCount, 5);
+  document.getElementById('usageArticles').textContent = wsArticles + ' total';
+
+  setUsage('usagePhotos', 'barPhotos', photoCount, 20);
+  setUsage('usageVideos', 'barVideos', videoCount, 5);
+  setUsage('usageRec', 'barRec', recCount, 20);
+}
+
+function setUsage(valueId, barId, count, limit) {
+  var el = document.getElementById(valueId);
+  var bar = document.getElementById(barId);
+  var pct = limit > 0 ? Math.min(100, Math.round(count / limit * 100)) : 0;
+
+  // Update text: "X/limit"
+  el.innerHTML = count + '<span class="plan-limit-unit">/' + limit + '</span>';
+
+  // Color class
+  el.classList.remove('warn', 'danger');
+  bar.classList.remove('warn', 'danger');
+  if (pct >= 100) {
+    el.classList.add('danger');
+    bar.classList.add('danger');
+  } else if (pct >= 60) {
+    el.classList.add('warn');
+    bar.classList.add('warn');
+  }
+
+  // Bar width
+  bar.style.width = pct + '%';
+}
+
+// ── LOAD USER ──
+var user = null;
+(function loadUser() {
+  var raw = localStorage.getItem('voxelUser');
+  if (!raw) { window.location.href = 'login.html'; return; }
+  user = JSON.parse(raw);
+  document.getElementById('profileName').value = user.name || '';
+  document.getElementById('profileEmail').value = user.email || '';
+  renderAvatar();
+  loadUsage();
+})();
+
+function renderAvatar() {
+  var lg = document.getElementById('avatarLg');
+  var span = document.getElementById('avatarInitials');
+  var existing = lg.querySelector('img');
+  var initials = (user.name || '?').split(' ').map(function(p) { return p[0] || ''; }).join('').slice(0, 2).toUpperCase() || '??';
+
+  if (user.avatarUrl) {
+    span.style.display = 'none';
+    if (!existing) {
+      existing = document.createElement('img');
+      existing.alt = 'Avatar';
+      lg.insertBefore(existing, lg.firstChild);
+    }
+    existing.src = user.avatarUrl;
+  } else {
+    if (existing) { existing.remove(); }
+    span.style.display = '';
+    span.textContent = initials;
+  }
+}
+
+// ── AVATAR UPLOAD (mock — stores base64 in localStorage) ──
+document.getElementById('avatarLg').addEventListener('click', function() {
+  document.getElementById('avatarInput').click();
+});
+
+document.getElementById('avatarInput').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) { return; }
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    user.avatarUrl = ev.target.result;
+    renderAvatar();
+    document.getElementById('saveProfileBtn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+  this.value = '';
+});
+
+// ── NAME INPUT ──
+document.getElementById('profileName').addEventListener('input', function() {
+  document.getElementById('saveProfileBtn').disabled = false;
+});
+
+// ── SAVE ──
+document.getElementById('saveProfileBtn').addEventListener('click', function() {
+  var newName = document.getElementById('profileName').value.trim();
+  if (!newName) { toast('Display name cannot be empty'); return; }
+  user.name = newName;
+  localStorage.setItem('voxelUser', JSON.stringify(user));
+  renderAvatar();
+  this.disabled = true;
+  toast('Profile saved');
+});
+
+// ── BACK ──
+document.getElementById('backBtn').addEventListener('click', function() {
+  window.location.href = 'home.html';
+});
+
+// ── BUG REPORT ──
+document.getElementById('bugSubmitBtn').addEventListener('click', function() {
+  var msg = document.getElementById('bugTextarea').value.trim();
+  if (!msg) { toast('Please describe the issue before sending'); return; }
+  document.getElementById('bugTextarea').value = '';
+  toast('Feedback sent — thank you!');
+});
+</script>
+</body>
+</html>

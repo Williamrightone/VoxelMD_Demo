@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoxelMD — Shared View</title>
+<script>if(localStorage.getItem('voxelTheme')==='dark')document.documentElement.className='dark';</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+:root{--bg:#F7F6F3;--surface:#fff;--surface2:#F0EFEB;--border:rgba(0,0,0,0.08);--border-md:rgba(0,0,0,0.13);--text:#1A1A1A;--text-2:#6B6B6B;--text-3:#ADADAD;--teal:#1D9E75;--teal-light:#E1F5EE;--teal-mid:#5DCAA5;--teal-dark:#179164;--amber:#BA7517;--red:#D94040;--purple:#534AB7;--purple-light:#EEEDFE;--radius:8px;--radius-lg:12px;--sidebar:230px;--right:260px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
+.app{display:flex;flex:1;height:100vh;overflow:hidden;}
+
+/* ── READ-ONLY BANNER ── */
+.readonly-banner{
+  background:var(--purple-light);border-bottom:1px solid rgba(83,74,183,0.18);
+  padding:7px 20px;display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--purple);flex-shrink:0;
+}
+.readonly-banner svg{width:13px;height:13px;flex-shrink:0;}
+.readonly-banner strong{font-weight:500;}
+.readonly-banner-spacer{flex:1;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);}
+.ws-back-row{display:flex;align-items:center;gap:7px;margin-bottom:10px;}
+.back-btn{display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--text-3);padding:3px 0;transition:color .12s;}
+.back-btn:hover{color:var(--teal);}
+.back-btn svg{width:12px;height:12px;}
+.ws-identity{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ws-icon-sm{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:white;flex-shrink:0;}
+.ws-name-sm{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.shared-by-row{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-3);}
+.shared-by-row svg{width:11px;height:11px;flex-shrink:0;}
+.shared-by-avatar{width:16px;height:16px;border-radius:50%;background:var(--purple-light);color:var(--purple);font-size:7px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+.sidebar-body{flex:1;overflow-y:auto;padding:10px 8px;}
+.sidebar-body::-webkit-scrollbar{width:4px;}
+.sidebar-body::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:2px;}
+.sec-label{font-size:10px;color:var(--text-3);letter-spacing:0.06em;text-transform:uppercase;padding:4px 6px 6px;}
+.tree-item{display:flex;align-items:center;border-radius:var(--radius);cursor:pointer;margin-bottom:1px;}
+.tree-item:hover{background:var(--surface2);}
+.tree-item.active{background:var(--teal-light);}
+.tree-item.active .item-label{color:var(--teal);font-weight:500;}
+.tree-toggle{width:20px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chevron{width:10px;height:10px;color:var(--text-3);transition:transform .15s;flex-shrink:0;}
+.chevron.open{transform:rotate(90deg);}
+.item-icon{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-right:5px;}
+.item-label{flex:1;font-size:13px;color:var(--text-2);padding:5px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;user-select:none;}
+.tree-children{padding-left:20px;}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{padding:12px 22px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;}
+.doc-title{font-size:15px;font-weight:500;}
+.doc-meta{font-size:11px;color:var(--text-3);margin-top:2px;}
+.topbar-actions{display:flex;gap:6px;flex-shrink:0;align-items:center;}
+.btn{padding:6px 12px;border-radius:var(--radius);border:1px solid var(--border-md);background:var(--surface);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text-2);cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .12s;}
+.btn:hover{background:var(--surface2);}
+.btn svg{width:12px;height:12px;}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:white;}
+.btn.primary:hover{background:#179164;}
+.content-area{flex:1;display:flex;overflow:hidden;}
+
+/* ── PREVIEW PANE (full width, no editor) ── */
+.preview-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--surface);}
+.pane-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;display:flex;align-items:center;gap:6px;}
+.pane-label-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;background:var(--purple-light);color:var(--purple);border-radius:4px;padding:1px 5px;}
+.pane-label-badge svg{width:8px;height:8px;}
+.preview-scroll{flex:1;overflow-y:auto;padding:24px 28px;}
+.preview-scroll::-webkit-scrollbar{width:4px;}
+.preview-scroll::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:2px;}
+.md-preview{font-size:14px;line-height:1.85;color:var(--text);max-width:680px;margin:0 auto;}
+.md-preview h1{font-size:20px;font-weight:500;margin:0 0 16px;}
+.md-preview h2{font-size:17px;font-weight:500;margin:20px 0 10px;}
+.md-preview h3{font-size:15px;font-weight:500;margin:16px 0 8px;}
+.md-preview p{margin:0 0 12px;}
+.md-preview ul,.md-preview ol{margin:0 0 12px;padding-left:20px;}
+.md-preview li{margin-bottom:4px;}
+.md-preview strong{font-weight:500;}
+.md-preview em{font-style:italic;color:var(--text-2);}
+.md-preview blockquote{border-left:3px solid var(--teal-mid);padding:4px 0 4px 14px;margin:0 0 12px;color:var(--text-2);font-style:italic;}
+.md-preview code{font-family:'DM Mono',monospace;font-size:12px;background:var(--surface2);padding:2px 5px;border-radius:4px;color:var(--amber);}
+.md-preview pre{background:#1E1E2E;border-radius:var(--radius);padding:14px 16px;margin:0 0 14px;overflow-x:auto;}
+.md-preview pre code{background:none;color:#CDD6F4;padding:0;font-size:12px;line-height:1.7;}
+.md-preview img{max-width:100%;border-radius:var(--radius);border:1px solid var(--border);display:block;margin:8px 0;}
+.md-preview a{color:var(--teal);text-decoration:none;}
+.md-preview a:hover{text-decoration:underline;}
+.md-preview hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
+.md-preview table{width:100%;border-collapse:collapse;margin:0 0 14px;font-size:13px;}
+.md-preview th{background:var(--surface2);font-weight:500;padding:6px 10px;border:1px solid var(--border);}
+.md-preview td{padding:6px 10px;border:1px solid var(--border);}
+.md-preview .tts-sentence{border-radius:3px;transition:background .15s;}
+.md-preview .tts-sentence.playing{background:var(--teal-light);color:var(--teal);}
+
+/* ── EMPTY STATE ── */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-3);gap:12px;}
+.empty-state svg{width:40px;height:40px;opacity:0.3;}
+.empty-state p{font-size:14px;}
+
+/* ── RIGHT PANEL (TTS only) ── */
+.right-panel{width:var(--right);flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.panel-section{padding:13px 15px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.psec-title{font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:9px;}
+select.voice-select{width:100%;font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 8px;border-radius:var(--radius);border:1px solid var(--border-md);background:var(--surface2);color:var(--text);outline:none;cursor:pointer;}
+.play-controls{display:flex;align-items:center;gap:8px;margin-top:10px;}
+.play-btn{width:34px;height:34px;border-radius:50%;background:var(--teal);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;}
+.play-btn:hover{background:#179164;}
+.play-btn svg{width:13px;height:13px;fill:white;}
+.progress-wrap{flex:1;}
+.progress-bar{height:4px;background:var(--surface2);border-radius:2px;}
+.progress-fill{height:100%;background:var(--teal);border-radius:2px;width:0%;transition:width .5s linear;}
+.time-row{display:flex;justify-content:space-between;margin-top:4px;}
+.time-lbl{font-size:10px;color:var(--text-3);font-family:'DM Mono',monospace;}
+.speed-row{display:flex;align-items:center;gap:6px;margin-top:10px;}
+.speed-lbl{font-size:11px;color:var(--text-2);flex:1;}
+.speed-btns{display:flex;gap:3px;}
+.spd{padding:3px 6px;border-radius:var(--radius);border:1px solid var(--border-md);background:none;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--text-2);cursor:pointer;transition:all .1s;}
+.spd.active{background:var(--teal-light);border-color:var(--teal-mid);color:var(--teal);}
+.tts-info{display:flex;align-items:center;gap:5px;margin-top:8px;flex-wrap:wrap;}
+.tts-badge{font-size:10px;padding:2px 6px;border-radius:20px;background:var(--surface2);color:var(--text-3);display:flex;align-items:center;gap:3px;}
+.tts-badge svg{width:9px;height:9px;}
+.waveform{display:flex;align-items:center;gap:2px;height:28px;margin-top:8px;opacity:0.4;transition:opacity .3s;}
+.waveform.active{opacity:1;}
+.wb{width:2px;border-radius:2px;background:var(--teal);transition:height .1s;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:white;font-size:13px;padding:8px 16px;border-radius:var(--radius);opacity:0;transition:all .25s;z-index:999;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle{width:36px;height:20px;background:var(--surface2);border:1px solid var(--border-md);border-radius:10px;cursor:pointer;position:relative;padding:0;transition:background .2s,border-color .2s;flex-shrink:0;}
+.theme-toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:var(--text-3);top:2px;left:2px;transition:transform .2s,background .2s;}
+html.dark .theme-toggle{background:rgba(29,158,117,0.15);border-color:var(--teal-mid);}
+html.dark .theme-toggle::after{transform:translateX(16px);background:var(--teal);}
+.theme-sun-icon{width:13px;height:13px;color:var(--amber);flex-shrink:0;opacity:0.8;}
+
+/* ── DARK MODE ── */
+html.dark{--bg:#1C1B19;--surface:#242321;--surface2:#2E2C2A;--border:rgba(255,255,255,0.07);--border-md:rgba(255,255,255,0.12);--text:#E8E6E1;--text-2:#9A9891;--text-3:#575451;--teal-light:rgba(29,158,117,0.18);--purple-light:rgba(83,74,183,0.18);}
+html.dark select.voice-select{background:var(--surface2);color:var(--text);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── SIDEBAR ── -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="ws-back-row">
+      <button class="back-btn" id="backBtn">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="10,4 6,8 10,12"/></svg>
+        All Workspaces
+      </button>
+    </div>
+    <div class="ws-identity">
+      <div class="ws-icon-sm" id="wsIconSm">T</div>
+      <div class="ws-name-sm" id="wsNameSm">Shared Workspace</div>
+    </div>
+    <div class="shared-by-row">
+      <div class="shared-by-avatar" id="sharedByAv">A</div>
+      <span id="sharedByLabel">Shared by —</span>
+    </div>
+  </div>
+
+  <div class="sidebar-body">
+    <div class="sec-label">Articles</div>
+    <div id="sharedTree"></div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- Read-only banner -->
+  <div class="readonly-banner">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="7" width="10" height="7" rx="1"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
+    <strong>Read-only</strong>&nbsp;— You can read and listen, but cannot edit this workspace.
+    <div class="readonly-banner-spacer"></div>
+    <span style="font-size:11px;opacity:0.7;" id="sharedByBanner">Shared by —</span>
+  </div>
+
+  <div class="topbar">
+    <div>
+      <div class="doc-title" id="docTitle">Select an article</div>
+      <div class="doc-meta" id="docMeta">Choose from the article list on the left</div>
+    </div>
+    <div class="topbar-actions">
+      <svg class="theme-sun-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="8" cy="8" r="3"/>
+        <line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/>
+        <line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/>
+        <line x1="3.3" y1="3.3" x2="4.6" y2="4.6"/><line x1="11.4" y1="11.4" x2="12.7" y2="12.7"/>
+        <line x1="12.7" y1="3.3" x2="11.4" y2="4.6"/><line x1="4.6" y1="11.4" x2="3.3" y2="12.7"/>
+      </svg>
+      <button class="theme-toggle" id="themeToggle" title="Toggle dark mode"></button>
+      <button class="btn primary" id="playAllBtn">
+        <svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg>Play all
+      </button>
+    </div>
+  </div>
+
+  <div class="content-area">
+    <div class="preview-pane">
+      <div class="pane-label">
+        Reading view
+        <span class="pane-label-badge">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="7" width="10" height="7" rx="1"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
+          Read-only
+        </span>
+      </div>
+      <div class="preview-scroll">
+        <div id="emptyState" class="empty-state">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="6" y="4" width="28" height="32" rx="3"/><line x1="12" y1="14" x2="28" y2="14"/><line x1="12" y1="20" x2="24" y2="20"/><line x1="12" y1="26" x2="20" y2="26"/></svg>
+          <p>No article selected</p>
+        </div>
+        <div class="md-preview" id="mdPreview" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Right panel: TTS only, no recording, no vocab -->
+    <div class="right-panel">
+      <div class="panel-section">
+        <div class="psec-title">AI Reader</div>
+        <select class="voice-select" id="voiceSelect">
+          <option value="af_bella">af_bella — American female</option>
+          <option value="am_adam">am_adam — American male</option>
+          <option value="bf_emma">bf_emma — British female</option>
+          <option value="bm_george">bm_george — British male</option>
+        </select>
+        <div class="play-controls">
+          <button class="play-btn" id="playBtn"><svg id="playIcon" viewBox="0 0 16 16"><polygon points="5,3 13,8 5,13"/></svg></button>
+          <div class="progress-wrap">
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="time-row"><span class="time-lbl" id="timeNow">0:00</span><span class="time-lbl" id="timeTotal">0:00</span></div>
+          </div>
+        </div>
+        <div class="speed-row">
+          <span class="speed-lbl">Speed</span>
+          <div class="speed-btns">
+            <button class="spd" data-speed="0.75">0.75x</button>
+            <button class="spd active" data-speed="1">1x</button>
+            <button class="spd" data-speed="1.25">1.25x</button>
+            <button class="spd" data-speed="1.5">1.5x</button>
+          </div>
+        </div>
+        <div class="tts-info">
+          <div class="tts-badge"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="3" width="10" height="7" rx="1"/><line x1="3" y1="1" x2="3" y2="3"/><line x1="9" y1="1" x2="9" y2="3"/></svg>skip code</div>
+          <div class="tts-badge"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="2" width="10" height="8" rx="1"/><line x1="4" y1="5" x2="8" y2="5"/></svg>skip images</div>
+        </div>
+        <div class="waveform" id="waveform">
+          <div class="wb" style="height:8px"></div><div class="wb" style="height:14px"></div><div class="wb" style="height:20px"></div>
+          <div class="wb" style="height:10px"></div><div class="wb" style="height:24px"></div><div class="wb" style="height:16px"></div>
+          <div class="wb" style="height:8px"></div><div class="wb" style="height:22px"></div><div class="wb" style="height:18px"></div>
+          <div class="wb" style="height:14px"></div><div class="wb" style="height:26px"></div><div class="wb" style="height:10px"></div>
+          <div class="wb" style="height:16px"></div><div class="wb" style="height:20px"></div><div class="wb" style="height:12px"></div>
+        </div>
+      </div>
+
+      <!-- Read-only info panel -->
+      <div class="panel-section" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px 15px;">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2" style="width:32px;height:32px;opacity:0.2;">
+          <rect x="5" y="13" width="22" height="16" rx="2"/>
+          <path d="M11 13V9a5 5 0 0110 0v4"/>
+          <circle cx="16" cy="21" r="2"/>
+        </svg>
+        <div style="font-size:11px;color:var(--text-3);text-align:center;line-height:1.5;">
+          This workspace is<br>read-only.<br>Recording and vocabulary<br>features are disabled.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- .app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── TOAST ──
+function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show');},2400);}
+
+// ── ESC HTML ──
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── STATE (must be declared before the load IIFE so stopPlay/buildTTS can access them) ──
+var activeDocId = null;
+var ttsState = {
+  sentences: [], idx: 0, isPlaying: false,
+  playInterval: null, waveInterval: null, speed: 1
+};
+
+// ── LOAD SHARED WORKSPACE ──
+var sw = null;
+(function load(){
+  var raw = localStorage.getItem('voxelSharedView');
+  if (!raw) { window.location.href = 'home.html'; return; }
+  sw = JSON.parse(raw);
+
+  // Sidebar workspace identity
+  document.getElementById('wsIconSm').textContent = sw.name.charAt(0).toUpperCase();
+  document.getElementById('wsIconSm').style.background = sw.color;
+  document.getElementById('wsNameSm').textContent = sw.name;
+  document.title = sw.name + ' — VoxelMD (Shared)';
+
+  // Shared by info
+  var byInitial = sw.sharedBy.charAt(0).toUpperCase();
+  document.getElementById('sharedByAv').textContent = byInitial;
+  document.getElementById('sharedByLabel').textContent = 'Shared by ' + sw.sharedBy;
+  document.getElementById('sharedByBanner').textContent = 'Shared by ' + sw.sharedBy;
+
+  // Render article tree
+  renderTree(sw.tree, document.getElementById('sharedTree'));
+
+  // Auto-select first doc
+  var firstDoc = findFirstDoc(sw.tree);
+  if (firstDoc) { selectDoc(firstDoc); }
+})();
+
+// ── TREE ──
+function findFirstDoc(nodes) {
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i].type === 'doc') return nodes[i];
+    if (nodes[i].children) {
+      var r = findFirstDoc(nodes[i].children);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+
+function findNode(nodes, id) {
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i].id === id) return nodes[i];
+    if (nodes[i].children) {
+      var r = findNode(nodes[i].children, id);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+
+function renderTree(nodes, container) {
+  container.innerHTML = '';
+  nodes.forEach(function(node) {
+    if (node.type === 'folder') {
+      var wrap = document.createElement('div');
+      var row = document.createElement('div');
+      row.className = 'tree-item';
+      row.innerHTML =
+        '<div class="tree-toggle"><svg class="chevron' + (node.open ? ' open' : '') + '" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="6,4 10,8 6,12"/></svg></div>' +
+        '<div class="item-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4a1 1 0 011-1h3l1.5 2H13a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V4z"/></svg></div>' +
+        '<div class="item-label">' + esc(node.label) + '</div>';
+      wrap.appendChild(row);
+      if (node.open && node.children) {
+        var ch = document.createElement('div');
+        ch.className = 'tree-children';
+        renderTree(node.children, ch);
+        wrap.appendChild(ch);
+      }
+      row.addEventListener('click', function() {
+        node.open = !node.open;
+        renderTree(sw.tree, document.getElementById('sharedTree'));
+      });
+      container.appendChild(wrap);
+    } else {
+      var drow = document.createElement('div');
+      drow.className = 'tree-item' + (node.id === activeDocId ? ' active' : '');
+      drow.innerHTML =
+        '<div class="tree-toggle"></div>' +
+        '<div class="item-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="2" width="10" height="12" rx="1"/><line x1="5" y1="6" x2="11" y2="6"/><line x1="5" y1="9" x2="9" y2="9"/></svg></div>' +
+        '<div class="item-label">' + esc(node.label) + '</div>';
+      drow.addEventListener('click', function() { stopPlay(); selectDoc(node); });
+      container.appendChild(drow);
+    }
+  });
+}
+
+// ── SELECT DOC ──
+function selectDoc(doc) {
+  activeDocId = doc.id;
+  stopPlay();
+  renderTree(sw.tree, document.getElementById('sharedTree'));
+
+  document.getElementById('docTitle').textContent = doc.label;
+  var wc = extractTTSText(doc.content || '').trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('docMeta').textContent = wc + ' readable words · read-only';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('mdPreview').style.display = '';
+  document.getElementById('playAllBtn').style.display = '';
+
+  updatePreview(doc.content || '');
+  wrapSentences();
+  buildTTS(doc.content || '');
+}
+
+// ── MARKDOWN PREVIEW ──
+function updatePreview(md) {
+  var html = marked.parse(md);
+  document.getElementById('mdPreview').innerHTML = html;
+}
+
+// ── TTS ──
+function extractTTSText(md) {
+  return md
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`]+`/g, '')
+    .replace(/!\[.*?\]\(.*?\)/g, '')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/[*_]{1,3}([^*_]+)[*_]{1,3}/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/^>\s?/gm, '')
+    .replace(/^[-*+]\s/gm, '')
+    .replace(/^\d+\.\s/gm, '');
+}
+
+function buildTTS(md) {
+  var text = extractTTSText(md);
+  ttsState.sentences = text.match(/[^.!?]+[.!?]+/g) || (text.trim() ? [text.trim()] : []);
+  ttsState.idx = 0;
+  ttsState.isPlaying = false;
+  var total = Math.max(1, Math.round(ttsState.sentences.length * 0.9));
+  document.getElementById('timeTotal').textContent = formatTime(total);
+  document.getElementById('timeNow').textContent = '0:00';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('playIcon').innerHTML = '<polygon points="5,3 13,8 5,13"/>';
+  document.getElementById('waveform').classList.remove('active');
+}
+
+function formatTime(s) { var m = Math.floor(s / 60), sec = Math.floor(s % 60); return m + ':' + (sec < 10 ? '0' : '') + sec; }
+
+function startPlay() {
+  if (!ttsState.sentences.length) return;
+  ttsState.isPlaying = true;
+  document.getElementById('playIcon').innerHTML = '<rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/>';
+  document.getElementById('waveform').classList.add('active');
+  document.getElementById('playAllBtn').innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5"><rect x="3" y="3" width="4" height="10" fill="white" stroke="none"/><rect x="9" y="3" width="4" height="10" fill="white" stroke="none"/></svg>Pause';
+  var total = Math.max(1, Math.round(ttsState.sentences.length * 0.9));
+  var elapsed = Math.round((ttsState.idx / ttsState.sentences.length) * total);
+  ttsState.playInterval = setInterval(function() {
+    elapsed++;
+    document.getElementById('timeNow').textContent = formatTime(elapsed);
+    document.getElementById('progressFill').style.width = Math.min(100, elapsed / total * 100) + '%';
+    if (elapsed >= total) { stopPlay(); return; }
+    // Highlight current sentence in preview
+    ttsState.idx = Math.round(elapsed / total * ttsState.sentences.length);
+    highlightSentence(ttsState.idx);
+    // Animate waveform bars
+    document.querySelectorAll('.wb').forEach(function(b) {
+      b.style.height = (4 + Math.random() * 22) + 'px';
+    });
+  }, 1000 / ttsState.speed);
+}
+
+function stopPlay() {
+  ttsState.isPlaying = false;
+  clearInterval(ttsState.playInterval);
+  document.getElementById('playIcon').innerHTML = '<polygon points="5,3 13,8 5,13"/>';
+  document.getElementById('waveform').classList.remove('active');
+  document.getElementById('playAllBtn').innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5"><polygon points="5,3 13,8 5,13"/></svg>Play all';
+  document.querySelectorAll('.tts-sentence').forEach(function(el) { el.classList.remove('playing'); });
+}
+
+function highlightSentence(idx) {
+  var sentences = document.querySelectorAll('.tts-sentence');
+  sentences.forEach(function(el, i) { el.classList.toggle('playing', i === idx); });
+  if (sentences[idx]) sentences[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Wrap sentences in preview for highlighting
+function wrapSentences() {
+  var preview = document.getElementById('mdPreview');
+  var walker = document.createTreeWalker(preview, NodeFilter.SHOW_TEXT);
+  var nodes = [];
+  var tn;
+  while ((tn = walker.nextNode())) nodes.push(tn);
+  nodes.forEach(function(tn) {
+    if (!tn.parentNode || tn.parentNode.nodeName === 'CODE' || tn.parentNode.nodeName === 'PRE') return;
+    var parts = tn.textContent.split(/(?<=[.!?])\s+/);
+    if (parts.length <= 1) return;
+    var frag = document.createDocumentFragment();
+    parts.forEach(function(p, i) {
+      var span = document.createElement('span');
+      span.className = 'tts-sentence';
+      span.textContent = p + (i < parts.length - 1 ? ' ' : '');
+      frag.appendChild(span);
+    });
+    tn.parentNode.replaceChild(frag, tn);
+  });
+}
+
+document.getElementById('playAllBtn').addEventListener('click', function() { ttsState.isPlaying ? stopPlay() : startPlay(); });
+document.getElementById('playBtn').addEventListener('click', function() { ttsState.isPlaying ? stopPlay() : startPlay(); });
+document.querySelectorAll('.spd').forEach(function(b) {
+  b.addEventListener('click', function() {
+    document.querySelectorAll('.spd').forEach(function(x) { x.classList.remove('active'); });
+    this.classList.add('active');
+    ttsState.speed = parseFloat(this.dataset.speed);
+    if (ttsState.isPlaying) { stopPlay(); startPlay(); }
+  });
+});
+
+// ── BACK ──
+document.getElementById('backBtn').addEventListener('click', function() { window.location.href = 'home.html'; });
+
+// ── THEME ──
+document.getElementById('themeToggle').addEventListener('click', function() {
+  var isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('voxelTheme', isDark ? 'dark' : 'light');
+});
+</script>
+</body>
+</html>

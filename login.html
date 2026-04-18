@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoxelMD — Sign in</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F6F3;
+  --surface: #fff;
+  --surface2: #F0EFEB;
+  --border: rgba(0,0,0,0.08);
+  --border-md: rgba(0,0,0,0.13);
+  --text: #1A1A1A;
+  --text-2: #6B6B6B;
+  --text-3: #ADADAD;
+  --teal: #1D9E75;
+  --teal-light: #E1F5EE;
+  --teal-dark: #179164;
+  --red: #D94040;
+  --radius: 8px;
+  --radius-lg: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  background: #0f1f1a;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 44px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.left-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 20% 110%, rgba(29,158,117,0.35) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 50% at 90% -10%, rgba(29,158,117,0.18) 0%, transparent 55%);
+  pointer-events: none;
+}
+/* subtle dot grid */
+.left-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.055) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+.lp-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+.lp-logo-icon {
+  width: 34px;
+  height: 34px;
+  background: var(--teal);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.lp-logo-icon svg { width: 18px; height: 18px; }
+.lp-logo-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: white;
+  letter-spacing: -0.3px;
+}
+.lp-logo-text em { color: var(--teal); font-style: normal; }
+
+.lp-hero {
+  position: relative;
+  z-index: 1;
+}
+.lp-hero h1 {
+  font-size: 30px;
+  font-weight: 500;
+  color: white;
+  line-height: 1.35;
+  letter-spacing: -0.5px;
+  margin-bottom: 16px;
+}
+.lp-hero h1 em {
+  font-style: normal;
+  color: var(--teal);
+}
+.lp-hero p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.7;
+  max-width: 340px;
+}
+
+.lp-features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+.lp-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.lp-feature-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: rgba(29,158,117,0.18);
+  border: 1px solid rgba(29,158,117,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.lp-feature-dot svg { width: 14px; height: 14px; color: var(--teal); }
+.lp-feature-body {}
+.lp-feature-title { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.85); margin-bottom: 2px; }
+.lp-feature-desc { font-size: 12px; color: rgba(255,255,255,0.38); line-height: 1.5; }
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+}
+
+.card-header {
+  margin-bottom: 32px;
+}
+.card-header h2 {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.4px;
+  margin-bottom: 5px;
+}
+.card-header p {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+/* OAUTH */
+.oauth-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+.oauth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px 16px;
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+  border: 1px solid var(--border-md);
+}
+.oauth-btn.google {
+  background: var(--surface);
+  color: var(--text);
+}
+.oauth-btn.google:hover { background: var(--surface2); border-color: rgba(0,0,0,0.2); }
+.oauth-btn.facebook {
+  background: #1877F2;
+  color: white;
+  border-color: #1877F2;
+}
+.oauth-btn.facebook:hover { background: #1468d8; }
+.oauth-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+.oauth-btn svg { flex-shrink: 0; }
+.oauth-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(0,0,0,0.15);
+  border-top-color: rgba(0,0,0,0.55);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+.oauth-btn.facebook .oauth-spinner { border-color: rgba(255,255,255,0.4); border-top-color: white; }
+.oauth-btn.loading svg { display: none; }
+.oauth-btn.loading .oauth-spinner { display: block; }
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.divider span { font-size: 12px; color: var(--text-3); white-space: nowrap; }
+
+/* FORM */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 500; color: var(--text-2); margin-bottom: 6px; display: block; }
+.input-wrap { position: relative; }
+.input-wrap > svg {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; color: var(--text-3); pointer-events: none;
+}
+.form-input {
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 9px 12px 9px 36px;
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius);
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.form-input:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(29,158,117,0.1);
+}
+.form-input::placeholder { color: var(--text-3); }
+.form-input.error { border-color: var(--red); }
+.form-input.error:focus { box-shadow: 0 0 0 3px rgba(217,64,64,0.1); }
+
+.pw-toggle {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--text-3); padding: 2px; display: flex; align-items: center;
+  transition: color 0.12s;
+}
+.pw-toggle:hover { color: var(--text-2); }
+.pw-toggle svg { width: 15px; height: 15px; }
+
+.forgot-row { display: flex; justify-content: flex-end; margin-top: 6px; margin-bottom: 20px; }
+.forgot-link { font-size: 12px; color: var(--teal); text-decoration: none; transition: opacity 0.12s; }
+.forgot-link:hover { opacity: 0.75; }
+
+.error-msg { font-size: 11px; color: var(--red); margin-top: 5px; display: none; }
+.error-msg.show { display: block; }
+
+.submit-btn {
+  width: 100%;
+  padding: 11px 16px;
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-bottom: 22px;
+}
+.submit-btn:hover { background: var(--teal-dark); }
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-spinner {
+  width: 15px; height: 15px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+.submit-btn.loading .btn-label { display: none; }
+.submit-btn.loading .btn-spinner { display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.signup-row { text-align: center; font-size: 13px; color: var(--text-3); }
+.signup-row a { color: var(--teal); text-decoration: none; font-weight: 500; }
+.signup-row a:hover { text-decoration: underline; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: white; font-size: 13px;
+  padding: 8px 16px; border-radius: var(--radius);
+  opacity: 0; transition: all 0.25s; z-index: 999;
+  pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 700px) {
+  body { grid-template-columns: 1fr; }
+  .left-panel { display: none; }
+}
+
+/* ── FORGOT PASSWORD MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 500;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal-box {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 28px 28px 24px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+  transform: translateY(10px);
+  transition: transform 0.2s;
+}
+.modal-overlay.open .modal-box { transform: translateY(0); }
+.modal-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.modal-header h3 {
+  font-size: 16px; font-weight: 500; color: var(--text); letter-spacing: -0.3px;
+}
+.modal-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-3); padding: 2px; display: flex; align-items: center;
+  transition: color 0.12s; margin-top: -2px;
+}
+.modal-close:hover { color: var(--text-2); }
+.modal-close svg { width: 16px; height: 16px; }
+.modal-desc {
+  font-size: 13px; color: var(--text-2); line-height: 1.55;
+  margin-bottom: 20px;
+}
+.modal-form-group { margin-bottom: 16px; }
+.modal-submit {
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.modal-submit:hover { background: var(--teal-dark); }
+.modal-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.modal-submit.loading .btn-label { display: none; }
+.modal-submit.loading .btn-spinner { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ── LEFT: BRANDING ── -->
+<div class="left-panel">
+  <div class="lp-logo">
+    <div class="lp-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="8" height="8" rx="1.5" fill="white" opacity="0.95"/>
+        <rect x="13" y="3" width="8" height="8" rx="1.5" fill="white" opacity="0.6"/>
+        <rect x="3" y="13" width="8" height="8" rx="1.5" fill="white" opacity="0.6"/>
+        <rect x="13" y="13" width="8" height="8" rx="1.5" fill="white" opacity="0.3"/>
+      </svg>
+    </div>
+    <div class="lp-logo-text">Voxel<em>MD</em></div>
+  </div>
+
+  <div class="lp-hero">
+    <h1>Speak English<br>with <em>confidence</em></h1>
+    <p>Paste any article, listen to AI narration, record yourself, and build your vocabulary — all in one place.</p>
+  </div>
+
+  <div class="lp-features">
+    <div class="lp-feature">
+      <div class="lp-feature-dot">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="3,2 13,8 3,14"/></svg>
+      </div>
+      <div class="lp-feature-body">
+        <div class="lp-feature-title">AI-powered narration</div>
+        <div class="lp-feature-desc">Kokoro TTS reads any Markdown article in natural English voices</div>
+      </div>
+    </div>
+    <div class="lp-feature">
+      <div class="lp-feature-dot">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+      </div>
+      <div class="lp-feature-body">
+        <div class="lp-feature-title">Compare & improve</div>
+        <div class="lp-feature-desc">Record yourself and replay alongside the AI reader to spot differences</div>
+      </div>
+    </div>
+    <div class="lp-feature">
+      <div class="lp-feature-dot">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><line x1="5" y1="7" x2="11" y2="7"/><line x1="5" y1="10" x2="8" y2="10"/></svg>
+      </div>
+      <div class="lp-feature-body">
+        <div class="lp-feature-title">Smart vocabulary</div>
+        <div class="lp-feature-desc">Select any word in the preview to save it with phonetics to your dictionary</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── RIGHT: FORM ── -->
+<div class="right-panel">
+  <div class="login-card">
+    <div class="card-header">
+      <h2>Welcome back</h2>
+      <p>Sign in to continue to your workspaces</p>
+    </div>
+
+    <div class="oauth-row">
+      <button class="oauth-btn google" id="googleBtn">
+        <svg width="18" height="18" viewBox="0 0 18 18">
+          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908C16.658 14.418 17.64 12.11 17.64 9.2z" fill="#4285F4"/>
+          <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.859-3.048.859-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+          <path d="M3.964 10.705A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.705V4.963H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.037l3.007-2.332z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.963L3.964 7.295C4.672 5.169 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        <span class="oauth-spinner"></span>
+        <span>Continue with Google</span>
+      </button>
+      <button class="oauth-btn facebook" id="facebookBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+          <path d="M24 12.073C24 5.404 18.627 0 12 0S0 5.404 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.791-4.697 4.532-4.697 1.313 0 2.686.236 2.686.236v2.971H15.83c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+        </svg>
+        <span class="oauth-spinner"></span>
+        <span>Continue with Facebook</span>
+      </button>
+    </div>
+
+    <div class="divider"><span>or sign in with email</span></div>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="emailInput">Email address</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="3" width="14" height="10" rx="1.5"/><polyline points="1,4 8,9 15,4"/></svg>
+          <input type="email" id="emailInput" class="form-input" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="error-msg" id="emailError">Please enter a valid email address.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="passwordInput">Password</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="7" width="12" height="8" rx="1.5"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
+          <input type="password" id="passwordInput" class="form-input" placeholder="Enter your password" autocomplete="current-password" style="padding-right:40px">
+          <button type="button" class="pw-toggle" id="pwToggle">
+            <svg id="eyeIcon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>
+          </button>
+        </div>
+        <div class="error-msg" id="passwordError">Password must be at least 6 characters.</div>
+      </div>
+      <div class="forgot-row">
+        <a href="#" class="forgot-link" id="forgotLink">Forgot password?</a>
+      </div>
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <div class="btn-spinner"></div>
+        <span class="btn-label">Sign in</span>
+      </button>
+    </form>
+
+    <div class="signup-row">
+      New to VoxelMD? <a href="#" id="signupLink">Create an account</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── FORGOT PASSWORD MODAL ── -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Reset your password</h3>
+      <button class="modal-close" id="forgotModalClose" aria-label="Close">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>
+      </button>
+    </div>
+    <p class="modal-desc">Enter your account email and we'll send you a link to reset your password.</p>
+    <form id="forgotForm" novalidate>
+      <div class="modal-form-group">
+        <label class="form-label" for="forgotEmail">Email address</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="3" width="14" height="10" rx="1.5"/><polyline points="1,4 8,9 15,4"/></svg>
+          <input type="email" id="forgotEmail" class="form-input" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="error-msg" id="forgotEmailError">Please enter a valid email address.</div>
+      </div>
+      <button type="submit" class="modal-submit" id="forgotSubmitBtn">
+        <div class="btn-spinner"></div>
+        <span class="btn-label">Send reset link</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2600);
+}
+
+// Password visibility toggle
+var pwVisible = false;
+document.getElementById('pwToggle').addEventListener('click', function() {
+  pwVisible = !pwVisible;
+  var inp = document.getElementById('passwordInput');
+  inp.type = pwVisible ? 'text' : 'password';
+  document.getElementById('eyeIcon').innerHTML = pwVisible
+    ? '<path d="M2 2l12 12"/><path d="M6.7 6.8A2 2 0 009.2 9.3"/><path d="M4.1 4.1C2.7 5.2 1.5 6.7 1 8c1.2 2.5 4 5 7 5a7.1 7.1 0 003.2-.8M8.1 3.1C9 3 9.7 3 11 3.4c1.8.8 3 2.4 4 4.6-.5 1-1.2 2-2.1 2.8"/>'
+    : '<path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/>';
+});
+
+// OAuth buttons
+function oauthLogin(btnId, name, email) {
+  var btn = document.getElementById(btnId);
+  btn.classList.add('loading');
+  btn.disabled = true;
+  document.getElementById(btnId === 'googleBtn' ? 'facebookBtn' : 'googleBtn').disabled = true;
+  setTimeout(function() {
+    doLogin(name, email);
+  }, 900);
+}
+document.getElementById('googleBtn').addEventListener('click', function() {
+  oauthLogin('googleBtn', 'Demo User', 'demo@gmail.com');
+});
+document.getElementById('facebookBtn').addEventListener('click', function() {
+  oauthLogin('facebookBtn', 'Demo User', 'demo@facebook.com');
+});
+
+function doLogin(name, email) {
+  localStorage.setItem('voxelUser', JSON.stringify({ name: name, email: email }));
+  window.location.href = 'home.html';
+}
+
+// Email form
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var email = document.getElementById('emailInput').value.trim();
+  var password = document.getElementById('passwordInput').value;
+  var ok = true;
+
+  document.getElementById('emailInput').classList.remove('error');
+  document.getElementById('passwordInput').classList.remove('error');
+  document.getElementById('emailError').classList.remove('show');
+  document.getElementById('passwordError').classList.remove('show');
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('emailInput').classList.add('error');
+    document.getElementById('emailError').classList.add('show');
+    ok = false;
+  }
+  if (password.length < 6) {
+    document.getElementById('passwordInput').classList.add('error');
+    document.getElementById('passwordError').classList.add('show');
+    ok = false;
+  }
+  if (!ok) return;
+
+  var btn = document.getElementById('submitBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  setTimeout(function() {
+    var name = email.split('@')[0]
+      .replace(/[._-]/g, ' ')
+      .replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+    doLogin(name, email);
+  }, 1000);
+});
+
+// Forgot password modal
+var forgotModal = document.getElementById('forgotModal');
+function openForgotModal() {
+  document.getElementById('forgotEmail').value = document.getElementById('emailInput').value.trim();
+  document.getElementById('forgotEmailError').classList.remove('show');
+  document.getElementById('forgotEmail').classList.remove('error');
+  forgotModal.classList.add('open');
+  setTimeout(function() { document.getElementById('forgotEmail').focus(); }, 50);
+}
+function closeForgotModal() {
+  forgotModal.classList.remove('open');
+}
+document.getElementById('forgotLink').addEventListener('click', function(e) {
+  e.preventDefault();
+  openForgotModal();
+});
+document.getElementById('forgotModalClose').addEventListener('click', closeForgotModal);
+forgotModal.addEventListener('click', function(e) {
+  if (e.target === forgotModal) closeForgotModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && forgotModal.classList.contains('open')) closeForgotModal();
+});
+document.getElementById('forgotForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var email = document.getElementById('forgotEmail').value.trim();
+  document.getElementById('forgotEmail').classList.remove('error');
+  document.getElementById('forgotEmailError').classList.remove('show');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('forgotEmail').classList.add('error');
+    document.getElementById('forgotEmailError').classList.add('show');
+    return;
+  }
+  var btn = document.getElementById('forgotSubmitBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  setTimeout(function() {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    closeForgotModal();
+    showToast('Reset link sent to ' + email);
+  }, 1200);
+});
+document.getElementById('signupLink').addEventListener('click', function(e) {
+  e.preventDefault();
+  showToast('Sign-up coming soon! (demo)');
+});
+</script>
+</body>
+</html>

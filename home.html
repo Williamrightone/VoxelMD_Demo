@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoxelMD — My Workspaces</title>
+<script>if(localStorage.getItem('voxelTheme')==='dark')document.documentElement.className='dark';</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F6F3;
+  --surface: #fff;
+  --surface2: #F0EFEB;
+  --border: rgba(0,0,0,0.08);
+  --border-md: rgba(0,0,0,0.13);
+  --text: #1A1A1A;
+  --text-2: #6B6B6B;
+  --text-3: #ADADAD;
+  --teal: #1D9E75;
+  --teal-light: #E1F5EE;
+  --teal-mid: #5DCAA5;
+  --teal-dark: #179164;
+  --amber: #BA7517;
+  --red: #D94040;
+  --purple: #534AB7;
+  --purple-light: #EEEDFE;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --sidebar: 224px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar);
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.sb-header {
+  padding: 16px 14px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.logo-row { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+.logo-icon {
+  width: 28px; height: 28px;
+  background: var(--teal); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.logo-icon svg { width: 14px; height: 14px; }
+.logo-text { font-size: 15px; font-weight: 500; letter-spacing: -0.3px; }
+.logo-text em { color: var(--teal); font-style: normal; }
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 7px 10px;
+  cursor: text;
+  transition: border-color 0.15s;
+}
+.search-bar:focus-within { border-color: var(--teal-mid); }
+.search-bar svg { width: 13px; height: 13px; color: var(--text-3); flex-shrink: 0; }
+.search-bar input {
+  background: none; border: none; outline: none;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text);
+  flex: 1; min-width: 0;
+}
+.search-bar input::placeholder { color: var(--text-3); }
+
+/* ── SIDEBAR USER ROW (below logo) ── */
+.sb-user-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 4px; margin-bottom: 10px;
+  border-radius: var(--radius); cursor: pointer;
+  transition: background 0.12s;
+}
+.sb-user-row:hover { background: var(--surface2); }
+.sb-user-row .avatar { width: 24px; height: 24px; font-size: 9px; }
+.sb-user-row-info { flex: 1; min-width: 0; }
+.sb-user-row-name { font-size: 12px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-row-plan { font-size: 10px; color: var(--text-3); }
+
+.sb-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.sb-body::-webkit-scrollbar { width: 3px; }
+.sb-body::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+
+
+.sb-section { margin-bottom: 4px; }
+.sb-section-label {
+  font-size: 10px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 6px 14px 4px;
+}
+
+.sb-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+  border-radius: 0;
+  font-size: 13px;
+  color: var(--text-2);
+  transition: background 0.1s;
+}
+.sb-nav-item:hover { background: var(--bg); }
+.sb-nav-item.active { background: var(--teal-light); color: var(--teal); font-weight: 500; }
+.sb-nav-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+.sb-nav-item .nav-count {
+  margin-left: auto;
+  font-size: 10px;
+  background: var(--surface2);
+  color: var(--text-3);
+  border-radius: 10px;
+  padding: 1px 5px;
+}
+.sb-nav-item.active .nav-count { background: rgba(29,158,117,0.15); color: var(--teal); }
+
+.sb-divider { height: 1px; background: var(--border); margin: 6px 10px; }
+
+.sb-ws-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-2);
+  transition: background 0.1s;
+}
+.sb-ws-item:hover { background: var(--bg); }
+.sb-ws-item.active { background: var(--teal-light); color: var(--teal); }
+.sb-ws-dot {
+  width: 20px; height: 20px;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 500; color: white;
+  flex-shrink: 0;
+}
+.sb-ws-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.sb-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--purple-light);
+  color: var(--purple);
+  font-size: 10px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sb-user-info { flex: 1; min-width: 0; }
+.sb-user-name { font-size: 12px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-email { font-size: 10px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-settings-btn {
+  width: 24px; height: 24px;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-3); border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.1s, color 0.1s; flex-shrink: 0;
+}
+.sb-settings-btn:hover { background: var(--surface2); color: var(--text-2); }
+.sb-settings-btn svg { width: 14px; height: 14px; }
+
+/* ── MAIN ── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.topbar {
+  padding: 14px 28px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 12px;
+}
+.topbar-left h1 { font-size: 17px; font-weight: 500; letter-spacing: -0.3px; }
+.topbar-left p { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+.topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.view-toggle { display: flex; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.vt-btn {
+  width: 30px; height: 28px;
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-3); transition: all 0.1s;
+}
+.vt-btn.active { background: var(--surface); color: var(--text-2); }
+.vt-btn:hover:not(.active) { color: var(--text-2); }
+.vt-btn svg { width: 13px; height: 13px; }
+
+.tb-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 13px;
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; color: var(--text-2);
+  cursor: pointer; transition: background 0.12s;
+}
+.tb-btn:hover { background: var(--surface2); }
+.tb-btn.primary { background: var(--teal); color: white; border-color: var(--teal); }
+.tb-btn.primary:hover { background: var(--teal-dark); }
+.tb-btn svg { width: 12px; height: 12px; }
+
+/* ── CONTENT ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 28px 40px;
+}
+.content::-webkit-scrollbar { width: 4px; }
+.content::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+
+.section + .section { margin-top: 32px; }
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.section-title-count {
+  font-size: 10px;
+  background: var(--surface2);
+  color: var(--text-3);
+  border-radius: 10px;
+  padding: 1px 6px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+/* ── WORKSPACE GRID ── */
+.ws-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.ws-grid.list-view {
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+.ws-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.ws-card:hover {
+  border-color: var(--border-md);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  transform: translateY(-1px);
+}
+.ws-card:hover .ws-open-hint { opacity: 1; }
+.ws-card-accent { height: 5px; }
+.ws-card-body { padding: 14px 14px 12px; }
+.ws-card-icon-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.ws-icon {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 500; color: white;
+  flex-shrink: 0;
+}
+.ws-pin-icon { color: var(--text-3); }
+.ws-pin-icon svg { width: 13px; height: 13px; }
+.ws-pin-btn {
+  width: 24px; height: 24px;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text-3);
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+.ws-pin-btn:hover { background: var(--surface2); color: var(--amber); }
+.ws-pin-btn.pinned { color: var(--amber); }
+.ws-pin-btn.pinned:hover { background: rgba(186,117,23,0.12); color: var(--amber); }
+.ws-pin-btn svg { width: 13px; height: 13px; }
+.ws-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; line-height: 1.3; }
+.ws-stats { font-size: 11px; color: var(--text-3); margin-bottom: 8px; }
+.ws-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ws-date { font-size: 10px; color: var(--text-3); font-family: 'DM Mono', monospace; }
+.ws-open-hint {
+  font-size: 11px; color: var(--teal);
+  opacity: 0; transition: opacity 0.15s;
+  display: flex; align-items: center; gap: 3px;
+}
+.ws-open-hint svg { width: 10px; height: 10px; }
+
+/* list view card */
+.ws-grid.list-view .ws-card { display: flex; align-items: center; }
+.ws-grid.list-view .ws-card-accent { width: 5px; height: auto; align-self: stretch; flex-shrink: 0; }
+.ws-grid.list-view .ws-card-body { flex: 1; padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
+.ws-grid.list-view .ws-card-icon-row { margin: 0; }
+.ws-grid.list-view .ws-icon { width: 30px; height: 30px; font-size: 12px; border-radius: 7px; }
+.ws-grid.list-view .ws-main-info { flex: 1; }
+.ws-grid.list-view .ws-name { margin: 0 0 2px; font-size: 13px; }
+.ws-grid.list-view .ws-stats { margin: 0; }
+.ws-grid.list-view .ws-card-footer { flex-shrink: 0; }
+.ws-grid.list-view .ws-open-hint { opacity: 0; }
+.ws-grid.list-view .ws-card:hover .ws-open-hint { opacity: 1; }
+.ws-grid.list-view .ws-card-accent-hidden { display: none; }
+
+/* new workspace card */
+.ws-card.new-card {
+  border: 1.5px dashed var(--border-md);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  gap: 0;
+}
+.ws-card.new-card:hover { background: var(--surface); border-color: var(--teal-mid); }
+.new-card-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-3);
+}
+.new-card-inner svg { width: 22px; height: 22px; }
+.new-card-inner span { font-size: 12px; font-weight: 500; }
+.ws-card.new-card:hover .new-card-inner { color: var(--teal); }
+
+/* ── MODAL ── */
+.modal-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.25);
+  z-index: 100;
+  align-items: center; justify-content: center;
+}
+.modal-backdrop.show { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-lg);
+  padding: 26px 26px 22px;
+  width: 440px;
+  max-width: 90vw;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.13);
+}
+.modal h3 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+.modal-subtitle { font-size: 12px; color: var(--text-3); margin-bottom: 20px; }
+.modal-label { font-size: 12px; font-weight: 500; color: var(--text-2); margin-bottom: 6px; display: block; }
+.modal-input {
+  width: 100%; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; padding: 9px 11px;
+  border: 1px solid var(--border-md); border-radius: var(--radius);
+  color: var(--text); background: var(--bg); outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  margin-bottom: 18px;
+}
+.modal-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(29,158,117,0.1); background: #fff; }
+.modal-input::placeholder { color: var(--text-3); }
+
+.color-label { font-size: 12px; font-weight: 500; color: var(--text-2); margin-bottom: 8px; display: block; }
+.color-row { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+.color-swatch {
+  width: 28px; height: 28px; border-radius: 7px;
+  cursor: pointer; border: 2px solid transparent;
+  transition: transform 0.12s, border-color 0.12s;
+}
+.color-swatch:hover { transform: scale(1.1); }
+.color-swatch.selected { border-color: var(--text); }
+
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.modal-btn {
+  padding: 7px 16px; border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  cursor: pointer; transition: all 0.12s;
+  border: 1px solid var(--border-md); background: var(--surface);
+  color: var(--text-2);
+}
+.modal-btn:hover { background: var(--surface2); }
+.modal-btn.primary {
+  background: var(--teal); color: white; border-color: var(--teal);
+}
+.modal-btn.primary:hover { background: var(--teal-dark); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: white; font-size: 13px;
+  padding: 8px 16px; border-radius: var(--radius);
+  opacity: 0; transition: all 0.25s; z-index: 999;
+  pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── DARK MODE ── */
+html.dark {
+  --bg: #1C1B19;
+  --surface: #242321;
+  --surface2: #2E2C2A;
+  --border: rgba(255,255,255,0.07);
+  --border-md: rgba(255,255,255,0.12);
+  --text: #E8E6E1;
+  --text-2: #9A9891;
+  --text-3: #575451;
+  --teal-light: rgba(29,158,117,0.18);
+  --purple-light: rgba(83,74,183,0.18);
+}
+html.dark .modal-input:focus { background: var(--surface); }
+html.dark .color-swatch.selected { border-color: var(--text-2); }
+
+/* ── THEME TOGGLE ── */
+.theme-toggle {
+  width: 36px; height: 20px;
+  background: var(--surface2);
+  border: 1px solid var(--border-md);
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  transition: background .2s, border-color .2s;
+  flex-shrink: 0;
+}
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--text-3);
+  top: 2px; left: 2px;
+  transition: transform .2s, background .2s;
+}
+html.dark .theme-toggle { background: rgba(29,158,117,0.15); border-color: var(--teal-mid); }
+html.dark .theme-toggle::after { transform: translateX(16px); background: var(--teal); }
+.theme-sun-icon { width: 13px; height: 13px; color: var(--amber); flex-shrink: 0; opacity: 0.8; }
+
+/* ── MEDIA MANAGEMENT BUTTON ── */
+.media-mgmt-btn {
+  display: flex; align-items: center; gap: 7px;
+  width: calc(100% - 20px); margin: 6px 10px 4px;
+  padding: 8px 10px;
+  background: none; border: 1px solid var(--border-md);
+  border-radius: var(--radius); cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 12px;
+  color: var(--text-2); transition: all .15s;
+}
+.media-mgmt-btn:hover { background: var(--surface2); color: var(--teal); border-color: var(--teal-mid); }
+.media-mgmt-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* ── MEDIA MANAGEMENT MODAL ── */
+.mgmt-modal-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.3); z-index: 200;
+  align-items: center; justify-content: center;
+}
+.mgmt-modal-backdrop.show { display: flex; }
+.mgmt-modal {
+  background: var(--surface); border: 1px solid var(--border-md);
+  border-radius: var(--radius-lg); width: 90vw; height: 85vh;
+  max-width: 1100px; box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.mgmt-modal-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 20px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.mgmt-modal-header h3 { font-size: 15px; font-weight: 500; }
+.mgmt-modal-filters { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.mgmt-filter-select {
+  font-family: 'DM Sans', sans-serif; font-size: 12px;
+  padding: 5px 8px; border: 1px solid var(--border-md);
+  border-radius: var(--radius); background: var(--bg); color: var(--text);
+  outline: none; cursor: pointer;
+}
+.mgmt-modal-close {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-3); display: flex; align-items: center; justify-content: center;
+  transition: background .12s; flex-shrink: 0;
+}
+.mgmt-modal-close:hover { background: var(--surface2); color: var(--text); }
+.mgmt-modal-close svg { width: 14px; height: 14px; }
+.mgmt-modal-body { flex: 1; overflow-y: auto; padding: 20px; }
+.mgmt-modal-body::-webkit-scrollbar { width: 4px; }
+.mgmt-modal-body::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+
+/* Media grid */
+.media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.media-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden; transition: all .15s;
+}
+.media-item:hover { border-color: var(--border-md); box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
+.media-thumb {
+  width: 100%; aspect-ratio: 16/10;
+  background: var(--surface2); position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.media-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.media-thumb-icon { color: var(--text-3); }
+.media-thumb-icon svg { width: 32px; height: 32px; }
+.media-thumb-type {
+  position: absolute; top: 6px; left: 6px;
+  background: rgba(0,0,0,0.5); color: white;
+  font-size: 9px; padding: 2px 6px; border-radius: 4px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.media-item-body { padding: 8px 10px 10px; }
+.media-item-name { font-size: 11px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+.media-item-meta { font-size: 10px; color: var(--text-3); font-family: 'DM Mono', monospace; margin-bottom: 8px; }
+.media-item-actions { display: flex; gap: 4px; }
+.media-action-btn {
+  flex: 1; padding: 4px 5px; border-radius: var(--radius); border: 1px solid var(--border-md);
+  background: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  font-size: 10px; color: var(--text-2); transition: all .12s;
+  display: flex; align-items: center; justify-content: center; gap: 3px;
+}
+.media-action-btn:hover { background: var(--surface2); color: var(--text); }
+.media-action-btn.danger:hover { background: #C03030; border-color: #A52020; color: white; }
+.media-action-btn svg { width: 9px; height: 9px; }
+
+/* Empty state */
+.mgmt-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; min-height: 300px; gap: 12px; color: var(--text-3);
+}
+.mgmt-empty svg { width: 48px; height: 48px; opacity: 0.3; }
+.mgmt-empty p { font-size: 14px; }
+.mgmt-empty span { font-size: 12px; }
+
+/* Preview overlay */
+.media-preview-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.78); z-index: 400;
+  align-items: center; justify-content: center;
+}
+.media-preview-overlay.show { display: flex; }
+.media-preview-box {
+  background: var(--surface); border-radius: var(--radius-lg);
+  max-width: 80vw; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  display: flex; flex-direction: column;
+}
+.media-preview-img { max-width: 100%; max-height: 70vh; object-fit: contain; display: block; }
+.media-preview-footer {
+  padding: 12px 16px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.media-preview-name { flex: 1; font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+html.dark .mgmt-filter-select { background: var(--surface2); }
+html.dark .media-item { background: var(--surface2); }
+
+/* ── SHARED WITH ME ── */
+.shared-section { margin-top: 36px; }
+.shared-section-heading {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+}
+.shared-section-title {
+  font-size: 13px; font-weight: 500; color: var(--text-2);
+  text-transform: uppercase; letter-spacing: 0.06em; font-size: 11px;
+}
+.shared-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--purple-light); color: var(--purple);
+  border-radius: 20px; padding: 2px 8px;
+  font-size: 10px; font-weight: 500;
+}
+.shared-badge svg { width: 9px; height: 9px; }
+.ws-card.shared-card { border: 1px solid rgba(83,74,183,0.18); }
+.ws-card.shared-card:hover { border-color: rgba(83,74,183,0.4); }
+.ws-shared-meta {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px; color: var(--text-3); margin-top: 6px;
+}
+.ws-shared-meta svg { width: 9px; height: 9px; flex-shrink: 0; }
+.ws-readonly-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 9px; color: var(--purple); background: var(--purple-light);
+  border-radius: 4px; padding: 1px 5px; margin-top: 4px;
+}
+.ws-readonly-badge svg { width: 8px; height: 8px; }
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<div class="sidebar">
+  <div class="sb-header">
+    <div class="logo-row">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="8" height="8" rx="1.5" fill="white" opacity="0.95"/>
+          <rect x="13" y="3" width="8" height="8" rx="1.5" fill="white" opacity="0.6"/>
+          <rect x="3" y="13" width="8" height="8" rx="1.5" fill="white" opacity="0.6"/>
+          <rect x="13" y="13" width="8" height="8" rx="1.5" fill="white" opacity="0.3"/>
+        </svg>
+      </div>
+      <div class="logo-text">Voxel<em>MD</em></div>
+    </div>
+    <div class="sb-user-row" id="sbHeaderUserRow">
+      <div class="avatar" id="sbHeaderAvatar">WW</div>
+      <div class="sb-user-row-info">
+        <div class="sb-user-row-name" id="sbHeaderUserName">William Wu</div>
+        <div class="sb-user-row-plan">Free Plan</div>
+      </div>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" style="width:10px;height:10px;color:var(--text-3);flex-shrink:0;"><polyline points="6,4 10,8 6,12"/></svg>
+    </div>
+    <div class="search-bar">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+      <input type="text" placeholder="Search workspaces..." id="searchInput">
+    </div>
+  </div>
+
+  <div class="sb-body">
+    <button class="media-mgmt-btn" id="vocabHubBtn">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="1" y="2" width="10" height="13" rx="1.5"/>
+        <rect x="5" y="1" width="10" height="13" rx="1.5"/>
+        <line x1="8" y1="5" x2="12" y2="5"/>
+        <line x1="8" y1="8" x2="12" y2="8"/>
+        <line x1="8" y1="11" x2="10" y2="11"/>
+      </svg>
+      Vocabulary Hub
+    </button>
+    <button class="media-mgmt-btn" id="mediaMgmtBtn">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="1" y="2" width="14" height="11" rx="1.5"/>
+        <circle cx="5" cy="6" r="1.5"/>
+        <polyline points="1,10 5,7 8,9 11,7 15,10"/>
+        <line x1="4" y1="14" x2="12" y2="14"/>
+      </svg>
+      Media Management
+    </button>
+    <div class="sb-section">
+      <div class="sb-nav-item active" data-view="all">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        My Workspaces
+        <span class="nav-count" id="allCount">6</span>
+      </div>
+      <div class="sb-nav-item" data-view="recent">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6"/><polyline points="8,5 8,8 10,10"/></svg>
+        Recent
+      </div>
+      <div class="sb-nav-item" data-view="starred">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><polygon points="8,1 10,6 15,6 11,10 12.5,15 8,12 3.5,15 5,10 1,6 6,6"/></svg>
+        Pinned
+        <span class="nav-count" id="pinnedCount">2</span>
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">Workspaces</div>
+      <div id="sbWsList"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 id="mainTitle">My Workspaces</h1>
+      <p id="mainSubtitle">6 workspaces · 55 articles total</p>
+    </div>
+    <div class="topbar-right">
+      <svg class="theme-sun-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="8" cy="8" r="3"/>
+        <line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/>
+        <line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/>
+        <line x1="3.3" y1="3.3" x2="4.6" y2="4.6"/><line x1="11.4" y1="11.4" x2="12.7" y2="12.7"/>
+        <line x1="12.7" y1="3.3" x2="11.4" y2="4.6"/><line x1="4.6" y1="11.4" x2="3.3" y2="12.7"/>
+      </svg>
+      <button class="theme-toggle" id="themeToggle" title="Toggle dark mode"></button>
+      <div class="view-toggle">
+        <button class="vt-btn active" id="gridViewBtn" title="Grid view">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        </button>
+        <button class="vt-btn" id="listViewBtn" title="List view">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg>
+        </button>
+      </div>
+      <button class="tb-btn primary" id="topNewWsBtn">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg>
+        New Workspace
+      </button>
+      <button class="tb-btn" id="logoutBtn" title="Sign out" style="padding:7px 10px;">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3"/><polyline points="11,11 14,8 11,5"/><line x1="14" y1="8" x2="6" y2="8"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="content" id="contentArea"></div>
+</div>
+
+<!-- ── NEW WORKSPACE MODAL ── -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <h3>New Workspace</h3>
+    <p class="modal-subtitle">Workspaces group your study articles together</p>
+    <label class="modal-label" for="wsNameInput">Workspace name</label>
+    <input type="text" class="modal-input" id="wsNameInput" placeholder="e.g. TED Talks, Business English…" maxlength="40">
+    <span class="color-label">Color</span>
+    <div class="color-row" id="colorRow"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" id="cancelModal">Cancel</button>
+      <button class="modal-btn primary" id="confirmCreate">Create Workspace</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MEDIA MANAGEMENT MODAL ── -->
+<div class="mgmt-modal-backdrop" id="mgmtModalBackdrop">
+  <div class="mgmt-modal">
+    <div class="mgmt-modal-header">
+      <h3>Media Management</h3>
+      <div class="mgmt-modal-filters">
+        <select class="mgmt-filter-select" id="mgmtWsFilter">
+          <option value="">All workspaces</option>
+        </select>
+        <select class="mgmt-filter-select" id="mgmtTypeFilter">
+          <option value="">All types</option>
+          <option value="photo">Photos</option>
+          <option value="video">Videos</option>
+        </select>
+      </div>
+      <button class="mgmt-modal-close" id="mgmtModalClose">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+      </button>
+    </div>
+    <div class="mgmt-modal-body" id="mgmtModalBody"></div>
+  </div>
+</div>
+
+<!-- ── MEDIA PREVIEW OVERLAY ── -->
+<div class="media-preview-overlay" id="mediaPreviewOverlay">
+  <div class="media-preview-box">
+    <img class="media-preview-img" id="mediaPreviewImg" src="" alt="">
+    <div class="media-preview-footer">
+      <div class="media-preview-name" id="mediaPreviewName"></div>
+      <button class="media-action-btn" id="mediaPreviewCopyMd" style="flex:0 0 auto;padding:5px 10px;">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5" y="5" width="9" height="9" rx="1"/><path d="M3 11V3h8"/></svg>
+        Copy Markdown
+      </button>
+      <button class="media-action-btn" id="mediaPreviewClose" style="flex:0 0 auto;padding:5px 10px;">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── COLORS ──
+var COLORS = [
+  '#1D9E75','#534AB7','#BA7517','#D94040',
+  '#2980B9','#8E44AD','#16A085','#D35400'
+];
+
+// ── PIN SVG ICONS ──
+var PIN_OUTLINE_SVG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M9.5 3L13 6.5l-1.2 1.2-1-.4L8 10l.5 2.5-1 1-2-3.5-3 3-1-1 3-3L1.5 8l1-1L5 7.5 7.8 4.7l-.4-1L8.5 2.5 9.5 3z"/></svg>';
+var PIN_FILLED_SVG  = '<svg viewBox="0 0 16 16"><path d="M9.5 3L13 6.5l-1.2 1.2-1-.4L8 10l.5 2.5-1 1-2-3.5-3 3-1-1 3-3L1.5 8l1-1L5 7.5 7.8 4.7l-.4-1L8.5 2.5 9.5 3z" fill="currentColor"/></svg>';
+
+// ── DATA ──
+var workspaces = [
+  { id:1, name:'TED Talks',         color:'#1D9E75', folders:2, articles:8,  lastOpened:'Today',      pinned:true  },
+  { id:2, name:'Business English',  color:'#534AB7', folders:3, articles:12, lastOpened:'Yesterday',  pinned:true  },
+  { id:3, name:'Classic Literature',color:'#BA7517', folders:4, articles:15, lastOpened:'Apr 14',     pinned:false },
+  { id:4, name:'Daily News',        color:'#D94040', folders:1, articles:5,  lastOpened:'Apr 13',     pinned:false },
+  { id:5, name:'Academic Papers',   color:'#2980B9', folders:2, articles:6,  lastOpened:'Apr 10',     pinned:false },
+  { id:6, name:'Movie Scripts',     color:'#8E44AD', folders:3, articles:9,  lastOpened:'Apr 8',      pinned:false }
+];
+
+var idCounter = 100;
+var currentView = 'all'; // 'all' | 'recent' | 'starred'
+var listMode = false;
+var selectedColor = COLORS[0];
+
+// ── SHARED WITH ME (mock data) ──
+var sharedWorkspaces = [
+  {
+    id: 'sh-001', name: 'TED Talks — Public', color: '#2980B9', pinned: false,
+    sharedBy: 'Alice Chen', sharedByEmail: 'alice@example.com',
+    folders: 1, articles: 3, sharedAt: 'Apr 15',
+    tree: [
+      { id: 101, type: 'folder', label: 'Featured Talks', open: true, children: [
+        { id: 102, type: 'doc', label: 'Simon Sinek — Start With Why',
+          content: "# Start With Why\n\nHow do you explain when things don't go as we assumed? Or better, how do you explain when others are able to achieve things that seem to **defy all of the assumptions**? For example: Why is Apple so innovative? Year after year, after year, they're more innovative than all their competition. And yet, they're just a computer company. They're just like everyone else.\n\n> \"People don't buy *what* you do; they buy *why* you do it.\"\n\n## The Golden Circle\n\nEvery single person and organization on the planet knows **what** they do — one hundred percent. Some know **how** they do it, whether you call it your differentiating value proposition or your proprietary process. But very few people or organizations know **why** they do what they do.\n\nAnd by \"why\" I don't mean \"to make a profit.\" That's a result. By \"why\" I mean: what is your purpose, your cause, your belief? Why does your organization exist? Why do you get out of bed in the morning? And why should anyone care?\n\n## The Biology of Trust\n\nNone of what I'm telling you is my opinion. It's all grounded in the **tenets of biology**. If you look at a cross-section of the human brain from the top down, the brain is actually broken into three major components that correlate perfectly with the Golden Circle.\n\nThe newest part of our brain — our *homo sapien* brain — is the **neocortex**. The neocortex is responsible for all rational and analytical thought and language. The middle two sections make up the **limbic brain**, which is responsible for all of our feelings, like trust and loyalty. It's also responsible for all human behavior and all decision-making. And it has no capacity for language.\n\nWhen we communicate from the outside in — when we lead with \"what\" — yes, people can understand vast amounts of complicated information, like features and benefits and facts and figures. It just doesn't drive behavior. When we can communicate from the **inside out**, we're talking directly to the part of the brain that controls behavior, and we allow people to rationalize it with the tangible things we say and do.\n\n## The Goal\n\nThe goal is not to do business with everybody who *needs* what you have. The goal is to do business with people who **believe what you believe**. Martin Luther King gave the \"I Have a Dream\" speech, not the \"I Have a Plan\" speech. He was not the only man in America who suffered in a pre-civil rights America. He was not the only great orator of the day. Why him? Because he didn't go around telling people what needed to change in America. He went around and told people what he *believed*. And people who believed what he believed took his cause and made it their own." },
+
+        { id: 103, type: 'doc', label: 'Brené Brown — The Power of Vulnerability',
+          content: "# The Power of Vulnerability\n\nSo I'll start with this: a couple years ago, an event planner called me because I was going to do a speaking event. She said, \"I'm really struggling with how to write about you on the little flyer.\" And I thought, just call me a *researcher*. She said, \"I can do that. But I also want to say that you do work on — \" and she used the word \"feelings.\" And I was like, \"God, that sounds horrible.\"\n\n## What Wholehearted People Have in Common\n\nWhen I looked at the people who felt a strong sense of love and belonging, they had one thing in common: a **sense of worthiness**. They believed they were worthy of love and belonging. That's it. They didn't have better or easier lives — they simply had the courage to be imperfect.\n\nThey had the **compassion** to be kind to themselves first, and then to others. And the last thing they had in common: they were willing to let go of who they thought they should be in order to be who they were.\n\n> \"Vulnerability is not weakness. And that myth is profoundly dangerous.\"\n\n## The Original Definition\n\nVulnerability is basically **uncertainty, risk, and emotional exposure**. And I don't know about you, but the way I define vulnerability — and the profound courage it takes — is this: *to show up and be seen when we have no control over the outcome*.\n\nVulnerability is the birthplace of innovation, creativity, and change. To create is to make something that has never existed before. There's nothing more vulnerable than that. Adaptability to change is all about vulnerability.\n\n## Numbing Vulnerability\n\nHere's what we know from the research: **you cannot selectively numb emotions**. When we numb difficult feelings, we numb joy. We numb gratitude. We numb happiness. And then we are miserable. And then we are looking for purpose and meaning. And then we feel vulnerable, and then we numb.\n\nThe other thing we do is we make everything that's uncertain certain. Religion has gone from a belief in faith and mystery to certainty. \"I'm right, you're wrong, shut up.\" That's it. Just certain.\n\nWe perfect. If there's anyone who wants their children to know that they're loved and that they belong and that they are worthy — show up. Be seen. Live brave." },
+
+        { id: 104, type: 'doc', label: 'Amy Cuddy — Your Body Language',
+          content: "# Your Body Language May Shape Who You Are\n\nSo I want to start by offering you a free no-tech life hack, and all it requires is this: **change your posture** for two minutes. But before I give it to you, I want to ask you to do something for me. For the next few minutes, I want you to really pay attention to what is happening in your own body right now.\n\nAm I making you nervous? Are you breathing? Notice what you're doing with your body. Our **nonverbals** govern how other people think and feel about us. There's a lot of evidence that shows that we change our own body chemistry simply by changing body positions.\n\n## High Power vs Low Power\n\nSo we have two minutes. Before you go into the next stressful evaluative situation — a job interview, a difficult conversation, a first date — adopt a **high-power pose** in the elevator, in a bathroom stall.\n\n| Pose Type | Effect |\n|-----------|--------|\n| High Power | Increases testosterone +20%, decreases cortisol -25% |\n| Low Power | Decreases testosterone -10%, increases cortisol +15% |\n\n> \"Our bodies change our minds, and our minds change our behavior, and our behavior can change our outcomes.\"\n\n## The Science\n\nSo we know that in primate hierarchies, if you're high-ranking, your **testosterone** goes up and your **cortisol** goes down. After decisive action — winning a competition, getting promoted — you see these hormonal changes. These power-pose changes happened in the brains of our subjects.\n\nDon't leave that situation feeling like you didn't represent yourself. Give yourself a chance to succeed, to get into that room and perform at your best by doing this tiny thing first.\n\n## The Message\n\nSo I want to end on a slightly different note. I want to be very clear. What I'm saying is this: **fake it till you *become* it**. Do it enough until you actually become it and internalize it.\n\nThe last thing I'm going to leave you with is this: tiny tweaks can lead to **big changes**. So this is two minutes. It's free. You can do it anywhere. No one needs to know. Just do it, and change your presence from the inside out." }
+      ]}
+    ]
+  },
+  {
+    id: 'sh-002', name: 'Business English Essentials', color: '#8E44AD', pinned: false,
+    sharedBy: 'Bob Lin', sharedByEmail: 'bob@example.com',
+    folders: 0, articles: 2, sharedAt: 'Apr 12',
+    tree: [
+      { id: 201, type: 'doc', label: 'Navigating Business Meetings',
+        content: "# Navigating Business Meetings in English\n\nWhether you're leading or participating in a meeting, the right **vocabulary and phrases** make all the difference. Fluent meeting English signals professionalism and helps you contribute meaningfully to every discussion.\n\n## Opening a Meeting\n\nA confident opening sets the tone. Here are phrases used by native speakers:\n\n- *\"Let's get started — thanks for making time today.\"*\n- *\"I'd like to call this meeting to order.\"*\n- *\"Before we begin, does everyone have the agenda?\"*\n- *\"We have about an hour together, so let's make it productive.\"*\n\n## Sharing Your Point of View\n\nIn international settings, directness is valued, but it must be paired with **tact**. Avoid starting sentences with a harsh \"no.\" Instead:\n\n- *\"From my perspective, the data suggests a different approach.\"*\n- *\"I see your point, and I'd like to add something.\"*\n- *\"With respect, I think we should also consider...\"*\n- *\"That's a fair point — though I'd push back slightly on one thing.\"*\n\n## Asking for Clarification\n\nNever guess at instructions or decisions. It's completely normal and **professional** to ask:\n\n- *\"Could you elaborate on that?\"*\n- *\"Just to make sure I understand — are you saying...?\"*\n- *\"Can you walk me through your reasoning?\"*\n\n## Handling Disagreements\n\nDisagreement is part of productive meetings. The key is keeping emotions out of it:\n\n> *\"I appreciate your perspective, but I'd like to offer a different interpretation of the numbers.\"*\n\nAvoid phrases like \"you're wrong\" or \"that's a bad idea.\" Instead, redirect with *\"What if we considered...\"* or *\"Another way to look at this might be...\"*\n\n## Closing Strong\n\nAlways leave a meeting with **clear next steps** and ownership:\n\n- *\"Let's recap the action items before we wrap up.\"*\n- *\"Who owns this? And what's the deadline?\"*\n- *\"I'll send a summary to the group by end of day.\"*\n- *\"Thanks everyone — this was a productive session.\"*" },
+
+      { id: 202, type: 'doc', label: 'Writing Professional Emails',
+        content: "# Writing Professional Emails in English\n\nEmail is the primary channel for business communication globally. A well-crafted email is **concise, respectful, and actionable**. Poorly written emails, on the other hand, can damage relationships and delay decisions.\n\n## The Anatomy of a Good Email\n\nEvery professional email has four parts:\n\n1. **Subject line** — clear and specific (*\"Q2 Budget Review — Action Required by Friday\"*)\n2. **Opening** — warm but efficient\n3. **Body** — one idea per paragraph, short sentences\n4. **Closing** — clear call to action or next step\n\n## Opening Lines That Work\n\nThe opening sets the tone. Match your greeting to the relationship:\n\n| Relationship | Opening |\n|---|---|\n| Formal / first contact | *Dear Mr. Chen, / Dear Ms. Yamamoto,* |\n| Professional but warm | *Hi Sarah,* |\n| Internal / familiar | *Hey Tom,* |\n\nFollow with a brief, genuine line:\n- *\"I hope you had a good weekend.\"*\n- *\"Thank you for getting back to me so quickly.\"*\n- *\"Following up on our call yesterday...\"*\n\n## Making Requests Politely\n\n> Directness is efficient, but **politeness builds trust** over time.\n\nInstead of *\"Send me the report,\"* write:\n- *\"Could you send me the report by Thursday?\"*\n- *\"I'd really appreciate it if you could review the attached draft.\"*\n- *\"Would it be possible to schedule a call sometime this week?\"*\n\n## The Art of the Follow-Up\n\nIf you haven't received a reply in 3–5 business days, a gentle follow-up is appropriate:\n\n- *\"Just circling back on the email below — let me know if you need more information.\"*\n- *\"Bumping this up in case it got buried. Happy to jump on a quick call to discuss.\"*\n\n## Closing Lines\n\nEnd with a **clear next step** and a professional sign-off:\n\n- *\"Please let me know if you have any questions — I'm happy to clarify.\"*\n- *\"Looking forward to your thoughts.\"*\n- *\"Best regards, / Warm regards, / Sincerely,\"*\n\nAvoid overly casual closings (*\"Cheers\"* may feel inappropriate in formal contexts) and unnecessarily wordy ones (*\"Thanking you in anticipation of your favorable response\"*)." }
+    ]
+  }
+];
+
+// ── USER ──
+(function initUser() {
+  var raw = localStorage.getItem('voxelUser');
+  if (!raw) { window.location.href = 'login.html'; return; }
+  var user = JSON.parse(raw);
+  var initials = user.name.split(' ').map(function(p){return p[0]||'';}).join('').slice(0,2).toUpperCase() || '??';
+  document.getElementById('sbHeaderAvatar').textContent = initials;
+  document.getElementById('sbHeaderUserName').textContent = user.name;
+  if (user.avatarUrl) {
+    var el = document.getElementById('sbHeaderAvatar');
+    el.textContent = '';
+    el.style.backgroundImage = 'url(' + user.avatarUrl + ')';
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+  }
+})();
+
+document.getElementById('sbHeaderUserRow').addEventListener('click', function() {
+  window.location.href = 'profile.html';
+});
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+  localStorage.removeItem('voxelUser');
+  window.location.href = 'login.html';
+});
+
+// ── TOAST ──
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2400);
+}
+
+// ── ICON LETTER ──
+function wsInitial(name) {
+  return name.trim().charAt(0).toUpperCase();
+}
+
+// ── RENDER SIDEBAR WORKSPACE LIST ──
+function renderSbList() {
+  var list = document.getElementById('sbWsList');
+  var filtered = getFiltered();
+  list.innerHTML = '';
+  filtered.forEach(function(ws) {
+    var item = document.createElement('div');
+    item.className = 'sb-ws-item';
+    item.innerHTML =
+      '<div class="sb-ws-dot" style="background:' + ws.color + '">' + wsInitial(ws.name) + '</div>' +
+      '<div class="sb-ws-name">' + esc(ws.name) + '</div>';
+    item.addEventListener('click', function() { openWorkspace(ws); });
+    list.appendChild(item);
+  });
+  document.getElementById('allCount').textContent = workspaces.length;
+  var pinnedTotal = workspaces.filter(function(w){return w.pinned;}).length +
+                    sharedWorkspaces.filter(function(sw){return sw.pinned;}).length;
+  document.getElementById('pinnedCount').textContent = pinnedTotal;
+  // update subtitle
+  var total = workspaces.reduce(function(a,w){return a+w.articles;},0);
+  document.getElementById('mainSubtitle').textContent = workspaces.length + ' workspace' + (workspaces.length !== 1 ? 's' : '') + ' · ' + total + ' articles total';
+  // persist workspace list for profile page to read usage
+  localStorage.setItem('voxelWorkspaces', JSON.stringify(workspaces));
+}
+
+// ── FILTER ──
+function getFiltered() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var list = workspaces;
+  if (currentView === 'starred') list = list.filter(function(w){return w.pinned;});
+  if (currentView === 'recent') list = list.slice().sort(function(a,b){ return a.id > b.id ? -1 : 1; }).slice(0,4);
+  if (q) list = list.filter(function(w){return w.name.toLowerCase().includes(q);});
+  return list;
+}
+
+// ── RENDER MAIN GRID ──
+function renderMain() {
+  var area = document.getElementById('contentArea');
+  var filtered = getFiltered();
+  area.innerHTML = '';
+  var gridClass = 'ws-grid' + (listMode ? ' list-view' : '');
+
+  if (currentView === 'all' && !document.getElementById('searchInput').value) {
+    var pinnedWs     = filtered.filter(function(w){return w.pinned;});
+    var pinnedShared = sharedWorkspaces.filter(function(sw){return sw.pinned;});
+    var totalPinned  = pinnedWs.length + pinnedShared.length;
+
+    if (totalPinned) {
+      var pSec = document.createElement('div');
+      pSec.className = 'section';
+      pSec.innerHTML =
+        '<div class="section-header">' +
+          '<div class="section-title">Pinned<span class="section-title-count">' + totalPinned + '</span></div>' +
+        '</div>';
+      var pGrid = document.createElement('div');
+      pGrid.className = gridClass;
+      pinnedWs.forEach(function(ws) { pGrid.appendChild(makeCard(ws)); });
+      pinnedShared.forEach(function(sw) { pGrid.appendChild(makeSharedCard(sw)); });
+      pSec.appendChild(pGrid);
+      area.appendChild(pSec);
+    }
+    var aSec = makeSectionEl('All Workspaces', filtered.length, gridClass, filtered, true);
+    area.appendChild(aSec);
+  } else {
+    var label = currentView === 'starred' ? 'Pinned' : currentView === 'recent' ? 'Recent' : 'Results';
+    var sec = makeSectionEl(label, filtered.length, gridClass, filtered, currentView === 'all');
+    area.appendChild(sec);
+  }
+
+  // ── SHARED WITH ME (always shown in 'all' view, not affected by filters) ──
+  if (currentView === 'all') {
+    var sharedSec = document.createElement('div');
+    sharedSec.className = 'section shared-section';
+    sharedSec.innerHTML =
+      '<div class="shared-section-heading">' +
+        '<span class="shared-section-title">Shared with me</span>' +
+        '<span class="shared-badge">' +
+          '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="3" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="12" cy="13" r="1.5"/><line x1="10.2" y1="4" x2="5.8" y2="7"/><line x1="5.8" y1="9" x2="10.2" y2="12"/></svg>' +
+          sharedWorkspaces.length + ' shared' +
+        '</span>' +
+      '</div>';
+    var sharedGrid = document.createElement('div');
+    sharedGrid.className = gridClass;
+    sharedWorkspaces.forEach(function(sw) { sharedGrid.appendChild(makeSharedCard(sw)); });
+    sharedSec.appendChild(sharedGrid);
+    area.appendChild(sharedSec);
+  }
+
+  renderSbList();
+}
+
+function makeSharedCard(sw) {
+  var card = document.createElement('div');
+  card.className = 'ws-card shared-card';
+  var roSvg = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="7" width="10" height="7" rx="1"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>';
+  var shareSvg = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="3" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="12" cy="13" r="1.5"/><line x1="10.2" y1="4" x2="5.8" y2="7"/><line x1="5.8" y1="9" x2="10.2" y2="12"/></svg>';
+  var pinBtnHtml = '<div class="ws-pin-btn' + (sw.pinned ? ' pinned' : '') + '">' + (sw.pinned ? PIN_FILLED_SVG : PIN_OUTLINE_SVG) + '</div>';
+
+  if (listMode) {
+    card.innerHTML =
+      '<div class="ws-card-accent" style="background:' + sw.color + '"></div>' +
+      '<div class="ws-card-body">' +
+        '<div class="ws-card-icon-row"><div class="ws-icon" style="background:' + sw.color + '">' + sw.name.charAt(0).toUpperCase() + '</div></div>' +
+        '<div class="ws-main-info">' +
+          '<div class="ws-name">' + esc(sw.name) + '</div>' +
+          '<div class="ws-stats">' + sw.folders + ' folder' + (sw.folders !== 1 ? 's' : '') + ' · ' + sw.articles + ' article' + (sw.articles !== 1 ? 's' : '') + '</div>' +
+          '<div class="ws-shared-meta">' + shareSvg + 'Shared by ' + esc(sw.sharedBy) + '</div>' +
+        '</div>' +
+        '<div class="ws-card-footer">' +
+          '<div class="ws-readonly-badge">' + roSvg + 'Read-only</div>' +
+          '<div class="ws-open-hint"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="2,6 10,6"/><polyline points="7,3 10,6 7,9"/></svg>Open</div>' +
+        '</div>' +
+        pinBtnHtml +
+      '</div>';
+  } else {
+    card.innerHTML =
+      '<div class="ws-card-accent" style="background:' + sw.color + '"></div>' +
+      '<div class="ws-card-body">' +
+        '<div class="ws-card-icon-row">' +
+          '<div class="ws-icon" style="background:' + sw.color + '">' + sw.name.charAt(0).toUpperCase() + '</div>' +
+          pinBtnHtml +
+        '</div>' +
+        '<div class="ws-name">' + esc(sw.name) + '</div>' +
+        '<div class="ws-stats">' + sw.folders + ' folder' + (sw.folders !== 1 ? 's' : '') + ' · ' + sw.articles + ' article' + (sw.articles !== 1 ? 's' : '') + '</div>' +
+        '<div class="ws-shared-meta">' + shareSvg + 'Shared by ' + esc(sw.sharedBy) + '</div>' +
+        '<div class="ws-card-footer">' +
+          '<div class="ws-readonly-badge">' + roSvg + 'Read-only</div>' +
+          '<div class="ws-open-hint"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="2,6 10,6"/><polyline points="7,3 10,6 7,9"/></svg>Open</div>' +
+        '</div>' +
+      '</div>';
+  }
+  card.querySelector('.ws-pin-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    sw.pinned = !sw.pinned;
+    renderMain();
+    toast(sw.pinned ? 'Pinned "' + sw.name + '"' : 'Unpinned "' + sw.name + '"');
+  });
+  card.addEventListener('click', function() { openSharedWorkspace(sw); });
+  return card;
+}
+
+function openSharedWorkspace(sw) {
+  localStorage.setItem('voxelSharedView', JSON.stringify(sw));
+  window.location.href = 'shared-view.html';
+}
+
+function makeSectionEl(label, count, gridClass, items, showNew) {
+  var sec = document.createElement('div');
+  sec.className = 'section';
+  sec.innerHTML =
+    '<div class="section-header">' +
+      '<div class="section-title">' + esc(label) + '<span class="section-title-count">' + count + '</span></div>' +
+    '</div>';
+  var grid = document.createElement('div');
+  grid.className = gridClass;
+  items.forEach(function(ws) { grid.appendChild(makeCard(ws)); });
+  if (showNew) grid.appendChild(makeNewCard());
+  sec.appendChild(grid);
+  return sec;
+}
+
+function makeCard(ws) {
+  var card = document.createElement('div');
+  card.className = 'ws-card';
+  var pinBtnHtml = '<div class="ws-pin-btn' + (ws.pinned ? ' pinned' : '') + '">' + (ws.pinned ? PIN_FILLED_SVG : PIN_OUTLINE_SVG) + '</div>';
+
+  if (listMode) {
+    card.innerHTML =
+      '<div class="ws-card-accent" style="background:' + ws.color + '"></div>' +
+      '<div class="ws-card-body">' +
+        '<div class="ws-card-icon-row"><div class="ws-icon" style="background:' + ws.color + '">' + wsInitial(ws.name) + '</div></div>' +
+        '<div class="ws-main-info">' +
+          '<div class="ws-name">' + esc(ws.name) + '</div>' +
+          '<div class="ws-stats">' + ws.folders + ' folder' + (ws.folders!==1?'s':'') + ' · ' + ws.articles + ' article' + (ws.articles!==1?'s':'') + '</div>' +
+        '</div>' +
+        '<div class="ws-card-footer">' +
+          '<div class="ws-date">' + esc(ws.lastOpened) + '</div>' +
+          '<div class="ws-open-hint"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="2,6 10,6"/><polyline points="7,3 10,6 7,9"/></svg>Open</div>' +
+        '</div>' +
+        pinBtnHtml +
+      '</div>';
+  } else {
+    card.innerHTML =
+      '<div class="ws-card-accent" style="background:' + ws.color + '"></div>' +
+      '<div class="ws-card-body">' +
+        '<div class="ws-card-icon-row">' +
+          '<div class="ws-icon" style="background:' + ws.color + '">' + wsInitial(ws.name) + '</div>' +
+          pinBtnHtml +
+        '</div>' +
+        '<div class="ws-name">' + esc(ws.name) + '</div>' +
+        '<div class="ws-stats">' + ws.folders + ' folder' + (ws.folders!==1?'s':'') + ' · ' + ws.articles + ' article' + (ws.articles!==1?'s':'') + '</div>' +
+        '<div class="ws-card-footer">' +
+          '<div class="ws-date">' + esc(ws.lastOpened) + '</div>' +
+          '<div class="ws-open-hint"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="2,6 10,6"/><polyline points="7,3 10,6 7,9"/></svg>Open</div>' +
+        '</div>' +
+      '</div>';
+  }
+  card.querySelector('.ws-pin-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    ws.pinned = !ws.pinned;
+    renderMain();
+    toast(ws.pinned ? 'Pinned "' + ws.name + '"' : 'Unpinned "' + ws.name + '"');
+  });
+  card.addEventListener('click', function() { openWorkspace(ws); });
+  return card;
+}
+
+function makeNewCard() {
+  var card = document.createElement('div');
+  card.className = 'ws-card new-card';
+  card.innerHTML =
+    '<div class="new-card-inner">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+      '<span>New Workspace</span>' +
+    '</div>';
+  card.addEventListener('click', openModal);
+  return card;
+}
+
+// ── OPEN WORKSPACE ──
+function openWorkspace(ws) {
+  ws.lastOpened = 'Today';
+  localStorage.setItem('voxelWorkspace', JSON.stringify(ws));
+  window.location.href = 'main.html';
+}
+
+// ── VIEW TOGGLE ──
+document.getElementById('gridViewBtn').addEventListener('click', function() {
+  listMode = false;
+  this.classList.add('active');
+  document.getElementById('listViewBtn').classList.remove('active');
+  renderMain();
+});
+document.getElementById('listViewBtn').addEventListener('click', function() {
+  listMode = true;
+  this.classList.add('active');
+  document.getElementById('gridViewBtn').classList.remove('active');
+  renderMain();
+});
+
+// ── NAV ──
+document.querySelectorAll('.sb-nav-item[data-view]').forEach(function(item) {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.sb-nav-item').forEach(function(x) { x.classList.remove('active'); });
+    this.classList.add('active');
+    currentView = this.dataset.view;
+    var labels = { all: 'My Workspaces', recent: 'Recent', starred: 'Pinned' };
+    document.getElementById('mainTitle').textContent = labels[currentView];
+    renderMain();
+  });
+});
+
+// ── SEARCH ──
+document.getElementById('searchInput').addEventListener('input', renderMain);
+
+// ── MODAL ──
+function openModal() {
+  document.getElementById('wsNameInput').value = '';
+  document.getElementById('modalBackdrop').classList.add('show');
+  setTimeout(function() { document.getElementById('wsNameInput').focus(); }, 60);
+}
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('show');
+}
+document.getElementById('topNewWsBtn').addEventListener('click', openModal);
+document.getElementById('cancelModal').addEventListener('click', closeModal);
+document.getElementById('modalBackdrop').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.getElementById('wsNameInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('confirmCreate').click();
+});
+
+// Color swatches
+var colorRow = document.getElementById('colorRow');
+COLORS.forEach(function(c, i) {
+  var sw = document.createElement('div');
+  sw.className = 'color-swatch' + (i === 0 ? ' selected' : '');
+  sw.style.background = c;
+  sw.addEventListener('click', function() {
+    document.querySelectorAll('.color-swatch').forEach(function(x){x.classList.remove('selected');});
+    sw.classList.add('selected');
+    selectedColor = c;
+  });
+  colorRow.appendChild(sw);
+});
+
+document.getElementById('confirmCreate').addEventListener('click', function() {
+  var name = document.getElementById('wsNameInput').value.trim();
+  if (!name) { document.getElementById('wsNameInput').focus(); return; }
+  var ws = {
+    id: ++idCounter,
+    name: name,
+    color: selectedColor,
+    folders: 0,
+    articles: 0,
+    lastOpened: 'Just now',
+    pinned: false
+  };
+  workspaces.unshift(ws);
+  closeModal();
+  renderMain();
+  toast('Workspace "' + name + '" created');
+});
+
+// ── ESCAPE ──
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── SESSION INIT ──
+// sessionStorage clears on browser/tab close → media list auto-resets each session.
+// Both home.html and main.html share the same voxelSessionId + voxelMedia keys.
+(function initMediaSession(){
+  var sid=sessionStorage.getItem('voxelSessionId');
+  if(!sid){
+    sid='sess_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+    sessionStorage.setItem('voxelSessionId',sid);
+    localStorage.removeItem('voxelMedia');
+  }
+})();
+
+function getMediaList(){
+  var raw=localStorage.getItem('voxelMedia');
+  if(!raw)return[];
+  try{return JSON.parse(raw);}
+  catch(parseErr){console.warn('voxelMedia corrupted, resetting:',parseErr);localStorage.removeItem('voxelMedia');return[];}
+}
+function saveMediaListHome(list){localStorage.setItem('voxelMedia',JSON.stringify(list));}
+function getMediaById(id){return getMediaList().find(function(m){return m.id===id;})||null;}
+
+// ── MEDIA MANAGEMENT MODAL ──
+var mgmtPreviewUrl='';
+var mgmtPreviewMarkdown='';
+
+document.getElementById('vocabHubBtn').addEventListener('click', function() {
+  window.location.href = 'vocabulary.html';
+});
+
+document.getElementById('mediaMgmtBtn').addEventListener('click',function(){
+  renderMgmtModal();
+  document.getElementById('mgmtModalBackdrop').classList.add('show');
+});
+document.getElementById('mgmtModalClose').addEventListener('click',function(){
+  document.getElementById('mgmtModalBackdrop').classList.remove('show');
+});
+document.getElementById('mgmtModalBackdrop').addEventListener('click',function(e){
+  if(e.target===this)this.classList.remove('show');
+});
+document.getElementById('mgmtWsFilter').addEventListener('change',renderMgmtModal);
+document.getElementById('mgmtTypeFilter').addEventListener('change',renderMgmtModal);
+
+document.getElementById('mediaPreviewClose').addEventListener('click',function(){
+  document.getElementById('mediaPreviewOverlay').classList.remove('show');
+});
+document.getElementById('mediaPreviewOverlay').addEventListener('click',function(e){
+  if(e.target===this)this.classList.remove('show');
+});
+document.getElementById('mediaPreviewCopyMd').addEventListener('click',function(){
+  if(!mgmtPreviewMarkdown)return;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(mgmtPreviewMarkdown).then(function(){toast('Markdown copied');});
+  } else {
+    var ta=document.createElement('textarea');ta.value=mgmtPreviewMarkdown;
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');toast('Markdown copied');}catch(copyErr){console.warn('Clipboard fallback failed:',copyErr);toast('Copy failed — select text manually');}
+    ta.remove();
+  }
+});
+
+function renderMgmtModal(){
+  var list=getMediaList();
+  var wsFilter=document.getElementById('mgmtWsFilter').value;
+  var typeFilter=document.getElementById('mgmtTypeFilter').value;
+
+  // Rebuild workspace filter options, preserving current selection
+  var wsSelect=document.getElementById('mgmtWsFilter');
+  var prevWs=wsSelect.value;
+  var wsMap={};
+  list.forEach(function(m){if(m.workspaceName)wsMap[m.workspaceId]=m.workspaceName;});
+  wsSelect.innerHTML='<option value="">All workspaces</option>';
+  Object.keys(wsMap).forEach(function(id){
+    var opt=document.createElement('option');
+    opt.value=id;opt.textContent=wsMap[id];
+    if(id===prevWs)opt.selected=true;
+    wsSelect.appendChild(opt);
+  });
+
+  // Filter
+  var filtered=list;
+  if(wsFilter)filtered=filtered.filter(function(m){return String(m.workspaceId)===wsFilter;});
+  if(typeFilter)filtered=filtered.filter(function(m){return m.type===typeFilter;});
+
+  var body=document.getElementById('mgmtModalBody');
+  if(!filtered.length){
+    body.innerHTML=
+      '<div class="mgmt-empty">'+
+        '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="34" height="26" rx="3"/><circle cx="11" cy="13" r="3"/><polyline points="3,22 12,16 18,21 25,14 37,23"/><line x1="8" y1="34" x2="32" y2="34"/></svg>'+
+        '<p>No media found</p>'+
+        '<span>Upload photos from the article editor to see them here</span>'+
+      '</div>';
+    return;
+  }
+
+  var grid=document.createElement('div');
+  grid.className='media-grid';
+  filtered.forEach(function(item){grid.appendChild(makeMediaItem(item));});
+  body.innerHTML='';
+  body.appendChild(grid);
+}
+
+function makeMediaItem(item){
+  var card=document.createElement('div');
+  card.className='media-item';
+
+  var thumbHtml='';
+  if(item.type==='photo'&&item.previewUrl){
+    thumbHtml='<img src="'+esc(item.previewUrl)+'" alt="">';
+  } else {
+    var iconSvg=item.type==='video'
+      ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="4" width="14" height="13" rx="2"/><polyline points="16,8 22,5 22,15 16,12"/></svg>'
+      :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="3" width="20" height="16" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>';
+    thumbHtml='<div class="media-thumb-icon">'+iconSvg+'</div>';
+  }
+
+  var dateStr=item.uploadedAt?new Date(item.uploadedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—';
+  var sizeStr='—';
+  if(item.size){sizeStr=item.size>1048576?(item.size/1048576).toFixed(1)+'MB':(item.size/1024).toFixed(0)+'KB';}
+
+  card.innerHTML=
+    '<div class="media-thumb">'+thumbHtml+'<span class="media-thumb-type">'+esc(item.type)+'</span></div>'+
+    '<div class="media-item-body">'+
+      '<div class="media-item-name">'+esc(item.name)+'</div>'+
+      '<div class="media-item-meta">'+sizeStr+' · '+dateStr+'</div>'+
+      '<div class="media-item-actions">'+
+        '<button class="media-action-btn preview-btn" data-id="'+item.id+'">'+
+          '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>'+
+          'Preview'+
+        '</button>'+
+        '<button class="media-action-btn copy-btn" data-id="'+item.id+'">'+
+          '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5" y="5" width="9" height="9" rx="1"/><path d="M3 11V3h8"/></svg>'+
+          'Copy'+
+        '</button>'+
+        '<button class="media-action-btn danger del-btn" data-id="'+item.id+'">'+
+          '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><polyline points="3,5 13,5"/><path d="M6 5V3h4v2"/><path d="M4 5l1 8h6l1-8"/></svg>'+
+        '</button>'+
+      '</div>'+
+    '</div>';
+
+  // Preview
+  card.querySelector('.preview-btn').addEventListener('click',function(e){
+    e.stopPropagation();
+    var m=getMediaById(Number.parseInt(this.dataset.id,10));
+    if(!m)return;
+    var md='!['+m.name.replace(/\.[^.]+$/,'').replaceAll('-',' ').replaceAll('_',' ')+']('+m.url+')';
+    mgmtPreviewUrl=m.url;
+    mgmtPreviewMarkdown=md;
+    if(m.type==='photo'&&m.previewUrl){
+      document.getElementById('mediaPreviewImg').src=m.previewUrl;
+      document.getElementById('mediaPreviewName').textContent=m.name;
+      document.getElementById('mediaPreviewOverlay').classList.add('show');
+    } else if(navigator.clipboard){
+      // No local preview for videos or items without blob URL — copy markdown instead
+      navigator.clipboard.writeText(md).then(function(){toast('URL copied — no local preview');});
+    } else {
+      toast('URL copied — no local preview');
+    }
+  });
+
+  // Copy markdown
+  card.querySelector('.copy-btn').addEventListener('click',function(e){
+    e.stopPropagation();
+    var m=getMediaById(Number.parseInt(this.dataset.id,10));
+    if(!m)return;
+    var md='!['+m.name.replace(/\.[^.]+$/,'').replaceAll('-',' ').replaceAll('_',' ')+']('+m.url+')';
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(md).then(function(){toast('Markdown copied');});
+    } else {
+      var ta=document.createElement('textarea');ta.value=md;document.body.appendChild(ta);ta.select();
+      try{document.execCommand('copy');toast('Markdown copied');}catch(copyErr){console.warn('Clipboard fallback failed:',copyErr);toast('Copy failed — select text manually');}
+      ta.remove();
+    }
+  });
+
+  // Delete
+  card.querySelector('.del-btn').addEventListener('click',function(e){
+    e.stopPropagation();
+    var itemId=Number.parseInt(this.dataset.id,10);
+    var newList=getMediaList().filter(function(x){return x.id!==itemId;});
+    saveMediaListHome(newList);
+    toast('Media deleted');
+    renderMgmtModal();
+  });
+
+  return card;
+}
+
+// Close media modals on Escape (workspace modal handled by existing listener)
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    document.getElementById('mgmtModalBackdrop').classList.remove('show');
+    document.getElementById('mediaPreviewOverlay').classList.remove('show');
+  }
+});
+
+// ── THEME ──
+document.getElementById('themeToggle').addEventListener('click', function() {
+  var isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('voxelTheme', isDark ? 'dark' : 'light');
+});
+
+// ── INIT ──
+renderMain();
+</script>
+</body>
+</html>
