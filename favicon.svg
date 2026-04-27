@@ -1,0 +1,45 @@
+<svg viewBox="160 160 704 704" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2BA383"/>
+      <stop offset="100%" stop-color="#1F8C70"/>
+    </linearGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rounded teal body -->
+  <rect x="160" y="160" width="704" height="704" rx="150" ry="150" fill="url(#bgGrad)"/>
+
+  <!-- Four squares -->
+  <g>
+    <rect x="292" y="312" width="200" height="200" rx="40" ry="40" fill="#FFFFFF"/>
+    <rect x="532" y="312" width="200" height="200" rx="40" ry="40" fill="#D9EFE6"/>
+    <rect x="292" y="552" width="200" height="200" rx="40" ry="40" fill="#FFFFFF"/>
+    <rect x="532" y="552" width="200" height="200" rx="40" ry="40" fill="#D9EFE6"/>
+  </g>
+
+  <!-- Soundwave -->
+  <g stroke="#A8E6D2" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#softGlow)">
+    <path d="
+      M 220 652
+      L 380 652
+      L 410 632
+      L 445 685
+      L 485 555
+      L 520 760
+      L 560 580
+      L 600 700
+      L 635 640
+      L 665 660
+      L 695 645
+      L 730 652
+      L 804 652
+    "/>
+  </g>
+</svg>

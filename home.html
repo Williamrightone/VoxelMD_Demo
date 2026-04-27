@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VoxelMD — My Workspaces</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <script>if(localStorage.getItem('voxelTheme')==='dark')document.documentElement.className='dark';</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -305,6 +306,19 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 }
 .ws-pin-icon { color: var(--text-3); }
 .ws-pin-icon svg { width: 13px; height: 13px; }
+.ws-card-actions { display: flex; align-items: center; gap: 2px; }
+.ws-edit-btn {
+  width: 24px; height: 24px;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-3);
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0; opacity: 0;
+}
+.ws-edit-btn svg { width: 12px; height: 12px; }
+.ws-edit-btn:hover { background: var(--surface2); color: var(--text); }
+.ws-card:hover .ws-edit-btn { opacity: 1; }
+
 .ws-pin-btn {
   width: 24px; height: 24px;
   border-radius: 5px;
@@ -755,6 +769,22 @@ html.dark .media-item { background: var(--surface2); }
   </div>
 </div>
 
+<!-- ── EDIT WORKSPACE MODAL ── -->
+<div class="modal-backdrop" id="editModalBackdrop">
+  <div class="modal">
+    <h3>Edit Workspace</h3>
+    <p class="modal-subtitle">Update the name and color of your workspace</p>
+    <label class="modal-label" for="editWsNameInput">Workspace name</label>
+    <input type="text" class="modal-input" id="editWsNameInput" placeholder="e.g. TED Talks, Business English…" maxlength="40">
+    <span class="color-label">Color</span>
+    <div class="color-row" id="editColorRow"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" id="cancelEditModal">Cancel</button>
+      <button class="modal-btn primary" id="confirmEdit">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── MEDIA MANAGEMENT MODAL ── -->
 <div class="mgmt-modal-backdrop" id="mgmtModalBackdrop">
   <div class="mgmt-modal">
@@ -775,6 +805,20 @@ html.dark .media-item { background: var(--surface2); }
       </button>
     </div>
     <div class="mgmt-modal-body" id="mgmtModalBody"></div>
+  </div>
+</div>
+
+<!-- ── DELETE MEDIA CONFIRM MODAL ── -->
+<div class="modal-backdrop" id="deleteMediaBackdrop" style="z-index:300;">
+  <div class="modal" style="width:420px;">
+    <h3>Delete media?</h3>
+    <p class="modal-subtitle" id="deleteMediaDesc">
+      Delete <strong id="deleteMediaName"></strong>? This action cannot be undone. Any articles still referencing this image will show a broken link.
+    </p>
+    <div class="modal-actions">
+      <button class="modal-btn" id="cancelDeleteMedia">Cancel</button>
+      <button class="modal-btn primary" id="confirmDeleteMedia" style="background:var(--red);border-color:var(--red);">Delete</button>
+    </div>
   </div>
 </div>
 
@@ -805,6 +849,7 @@ var COLORS = [
 // ── PIN SVG ICONS ──
 var PIN_OUTLINE_SVG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M9.5 3L13 6.5l-1.2 1.2-1-.4L8 10l.5 2.5-1 1-2-3.5-3 3-1-1 3-3L1.5 8l1-1L5 7.5 7.8 4.7l-.4-1L8.5 2.5 9.5 3z"/></svg>';
 var PIN_FILLED_SVG  = '<svg viewBox="0 0 16 16"><path d="M9.5 3L13 6.5l-1.2 1.2-1-.4L8 10l.5 2.5-1 1-2-3.5-3 3-1-1 3-3L1.5 8l1-1L5 7.5 7.8 4.7l-.4-1L8.5 2.5 9.5 3z" fill="currentColor"/></svg>';
+var EDIT_SVG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M11 2l3 3-8 8H3v-3L11 2z"/></svg>';
 
 // ── DATA ──
 var workspaces = [
@@ -820,12 +865,14 @@ var idCounter = 100;
 var currentView = 'all'; // 'all' | 'recent' | 'starred'
 var listMode = false;
 var selectedColor = COLORS[0];
+var editingWs = null;
+var editSelectedColor = COLORS[0];
 
 // ── SHARED WITH ME (mock data) ──
 var sharedWorkspaces = [
   {
     id: 'sh-001', name: 'TED Talks — Public', color: '#2980B9', pinned: false,
-    sharedBy: 'Alice Chen', sharedByEmail: 'alice@example.com',
+    sharedBy: 'Alice Chen', sharedByEmail: 'alice@example.com', role: 'VIEWER',
     folders: 1, articles: 3, sharedAt: 'Apr 15',
     tree: [
       { id: 101, type: 'folder', label: 'Featured Talks', open: true, children: [
@@ -842,7 +889,7 @@ var sharedWorkspaces = [
   },
   {
     id: 'sh-002', name: 'Business English Essentials', color: '#8E44AD', pinned: false,
-    sharedBy: 'Bob Lin', sharedByEmail: 'bob@example.com',
+    sharedBy: 'Bob Lin', sharedByEmail: 'bob@example.com', role: 'VIEWER',
     folders: 0, articles: 2, sharedAt: 'Apr 12',
     tree: [
       { id: 201, type: 'doc', label: 'Navigating Business Meetings',
@@ -999,7 +1046,7 @@ function makeSharedCard(sw) {
         '<div class="ws-main-info">' +
           '<div class="ws-name">' + esc(sw.name) + '</div>' +
           '<div class="ws-stats">' + sw.folders + ' folder' + (sw.folders !== 1 ? 's' : '') + ' · ' + sw.articles + ' article' + (sw.articles !== 1 ? 's' : '') + '</div>' +
-          '<div class="ws-shared-meta">' + shareSvg + 'Shared by ' + esc(sw.sharedBy) + '</div>' +
+          '<div class="ws-shared-meta">' + shareSvg + esc(sw.role) + '</div>' +
         '</div>' +
         '<div class="ws-card-footer">' +
           '<div class="ws-readonly-badge">' + roSvg + 'Read-only</div>' +
@@ -1058,6 +1105,7 @@ function makeCard(ws) {
   var card = document.createElement('div');
   card.className = 'ws-card';
   var pinBtnHtml = '<div class="ws-pin-btn' + (ws.pinned ? ' pinned' : '') + '">' + (ws.pinned ? PIN_FILLED_SVG : PIN_OUTLINE_SVG) + '</div>';
+  var editBtnHtml = '<div class="ws-edit-btn" title="Edit workspace">' + EDIT_SVG + '</div>';
 
   if (listMode) {
     card.innerHTML =
@@ -1072,6 +1120,7 @@ function makeCard(ws) {
           '<div class="ws-date">' + esc(ws.lastOpened) + '</div>' +
           '<div class="ws-open-hint"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="2,6 10,6"/><polyline points="7,3 10,6 7,9"/></svg>Open</div>' +
         '</div>' +
+        editBtnHtml +
         pinBtnHtml +
       '</div>';
   } else {
@@ -1080,7 +1129,7 @@ function makeCard(ws) {
       '<div class="ws-card-body">' +
         '<div class="ws-card-icon-row">' +
           '<div class="ws-icon" style="background:' + ws.color + '">' + wsInitial(ws.name) + '</div>' +
-          pinBtnHtml +
+          '<div class="ws-card-actions">' + editBtnHtml + pinBtnHtml + '</div>' +
         '</div>' +
         '<div class="ws-name">' + esc(ws.name) + '</div>' +
         '<div class="ws-stats">' + ws.folders + ' folder' + (ws.folders!==1?'s':'') + ' · ' + ws.articles + ' article' + (ws.articles!==1?'s':'') + '</div>' +
@@ -1090,6 +1139,10 @@ function makeCard(ws) {
         '</div>' +
       '</div>';
   }
+  card.querySelector('.ws-edit-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    openEditModal(ws);
+  });
   card.querySelector('.ws-pin-btn').addEventListener('click', function(e) {
     e.stopPropagation();
     ws.pinned = !ws.pinned;
@@ -1198,9 +1251,63 @@ document.getElementById('confirmCreate').addEventListener('click', function() {
   toast('Workspace "' + name + '" created');
 });
 
+// ── EDIT MODAL ──
+function openEditModal(ws) {
+  editingWs = ws;
+  editSelectedColor = ws.color;
+  document.getElementById('editWsNameInput').value = ws.name;
+  document.querySelectorAll('#editColorRow .color-swatch').forEach(function(sw) {
+    sw.classList.toggle('selected', sw.dataset.color === ws.color);
+  });
+  document.getElementById('editModalBackdrop').classList.add('show');
+  setTimeout(function() {
+    var input = document.getElementById('editWsNameInput');
+    input.focus();
+    input.select();
+  }, 60);
+}
+function closeEditModal() {
+  document.getElementById('editModalBackdrop').classList.remove('show');
+  editingWs = null;
+}
+document.getElementById('cancelEditModal').addEventListener('click', closeEditModal);
+document.getElementById('editModalBackdrop').addEventListener('click', function(e) {
+  if (e.target === this) closeEditModal();
+});
+document.getElementById('editWsNameInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('confirmEdit').click();
+});
+
+var editColorRow = document.getElementById('editColorRow');
+COLORS.forEach(function(c) {
+  var sw = document.createElement('div');
+  sw.className = 'color-swatch';
+  sw.dataset.color = c;
+  sw.style.background = c;
+  sw.addEventListener('click', function() {
+    document.querySelectorAll('#editColorRow .color-swatch').forEach(function(x) { x.classList.remove('selected'); });
+    sw.classList.add('selected');
+    editSelectedColor = c;
+  });
+  editColorRow.appendChild(sw);
+});
+
+document.getElementById('confirmEdit').addEventListener('click', function() {
+  var name = document.getElementById('editWsNameInput').value.trim();
+  if (!name || !editingWs) { document.getElementById('editWsNameInput').focus(); return; }
+  editingWs.name = name;
+  editingWs.color = editSelectedColor;
+  closeEditModal();
+  renderMain();
+  toast('Workspace updated');
+});
+
 // ── ESCAPE ──
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape') {
+    if (document.getElementById('editModalBackdrop').classList.contains('show')) { closeEditModal(); return; }
+    closeModal();
+  }
 });
 
 function esc(s) {
@@ -1231,6 +1338,24 @@ function getMediaById(id){return getMediaList().find(function(m){return m.id===i
 // ── MEDIA MANAGEMENT MODAL ──
 var mgmtPreviewUrl='';
 var mgmtPreviewMarkdown='';
+var pendingDeleteId=null;
+
+document.getElementById('cancelDeleteMedia').addEventListener('click',function(){
+  pendingDeleteId=null;
+  document.getElementById('deleteMediaBackdrop').classList.remove('show');
+});
+document.getElementById('deleteMediaBackdrop').addEventListener('click',function(e){
+  if(e.target===this){pendingDeleteId=null;this.classList.remove('show');}
+});
+document.getElementById('confirmDeleteMedia').addEventListener('click',function(){
+  if(pendingDeleteId==null)return;
+  var newList=getMediaList().filter(function(x){return x.id!==pendingDeleteId;});
+  saveMediaListHome(newList);
+  pendingDeleteId=null;
+  document.getElementById('deleteMediaBackdrop').classList.remove('show');
+  toast('Media deleted');
+  renderMgmtModal();
+});
 
 document.getElementById('vocabHubBtn').addEventListener('click', function() {
   window.location.href = 'vocabulary.html';
@@ -1381,20 +1506,21 @@ function makeMediaItem(item){
     }
   });
 
-  // Delete
+  // Delete (opens confirmation modal)
   card.querySelector('.del-btn').addEventListener('click',function(e){
     e.stopPropagation();
     var itemId=Number.parseInt(this.dataset.id,10);
-    var newList=getMediaList().filter(function(x){return x.id!==itemId;});
-    saveMediaListHome(newList);
-    toast('Media deleted');
-    renderMgmtModal();
+    var m=getMediaById(itemId);
+    if(!m)return;
+    pendingDeleteId=itemId;
+    document.getElementById('deleteMediaName').textContent=m.name;
+    document.getElementById('deleteMediaBackdrop').classList.add('show');
   });
 
   return card;
 }
 
-// Close media modals on Escape (workspace modal handled by existing listener)
+// Close media modals on Escape (workspace modals handled by existing listener)
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
     document.getElementById('mgmtModalBackdrop').classList.remove('show');

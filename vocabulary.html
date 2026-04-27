@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VoxelMD — Vocabulary Hub</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <script>if(localStorage.getItem('voxelTheme')==='dark')document.documentElement.className='dark';</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -83,12 +84,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .sb-article-count { font-size: 10px; background: var(--surface2); color: var(--text-3); border-radius: 10px; padding: 1px 5px; flex-shrink: 0; }
 .sb-article-item.active .sb-article-count { background: rgba(29,158,117,0.15); color: var(--teal); }
 
-/* Expiring soon */
-.expiring-item { display: flex; align-items: center; gap: 8px; padding: 5px 14px; }
-.expiring-word { font-size: 12px; font-weight: 500; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.expiring-pill { font-size: 10px; color: var(--red); background: rgba(217,64,64,0.1); padding: 1px 6px; border-radius: 8px; flex-shrink: 0; white-space: nowrap; }
-.expiring-none { padding: 8px 14px; font-size: 12px; color: var(--text-3); }
-
 /* ── MAIN ── */
 .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .topbar {
@@ -157,7 +152,10 @@ html.dark .theme-toggle::after { transform: translateX(16px); background: var(--
 .vc-btn { width: 22px; height: 22px; border: none; background: none; cursor: pointer; color: var(--text-3); border-radius: 5px; display: flex; align-items: center; justify-content: center; transition: background 0.1s, color 0.1s; flex-shrink: 0; }
 .vc-btn:hover { background: var(--surface2); color: var(--text-2); }
 .vc-btn.danger:hover { background: rgba(217,64,64,0.1); color: var(--red); }
+.vc-btn.pin-btn.pinned { color: var(--teal); }
+.vc-btn.pin-btn.pinned:hover { background: var(--teal-light); color: var(--teal-dark); }
 .vc-btn svg { width: 11px; height: 11px; }
+.vocab-card.pinned { border-left: 3px solid var(--teal); }
 .vc-spacer { flex: 1; }
 
 .vc-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
@@ -170,7 +168,7 @@ html.dark .theme-toggle::after { transform: translateX(16px); background: var(--
 .zone-empty span { font-size: 12px; }
 
 /* ── TOAST ── */
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: white; font-size: 13px; padding: 8px 16px; border-radius: var(--radius); opacity: 0; transition: all 0.25s; z-index: 999; pointer-events: none; white-space: nowrap; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); font-size: 13px; padding: 8px 16px; border-radius: var(--radius); opacity: 0; transition: all 0.25s; z-index: 999; pointer-events: none; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ── DARK MODE ── */
@@ -202,7 +200,7 @@ html.dark {
       <div class="avatar" id="sbAvatar">WW</div>
       <div class="sb-user-row-info">
         <div class="sb-user-row-name" id="sbUserName">William Wu</div>
-        <div class="sb-user-row-plan">Free Plan</div>
+        <div class="sb-user-row-plan" id="sbUserPlan">Free Plan</div>
       </div>
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" style="width:10px;height:10px;color:var(--text-3);flex-shrink:0;"><polyline points="6,4 10,8 6,12"/></svg>
     </div>
@@ -226,10 +224,6 @@ html.dark {
     <div class="sb-section-label">Filter by Article</div>
     <div id="articleFilterList"></div>
 
-    <div class="sb-divider"></div>
-
-    <div class="sb-section-label">Expiring Soon</div>
-    <div id="expiringSoon"></div>
   </div>
 </div>
 
@@ -291,21 +285,19 @@ var NOW = Date.now();
 var DAY = 86400000;
 
 var DEMO_DATA = [
-  { id:1,  word:'ephemeral',      phonetic:'/ɪˈfɛm.ər.əl/',          articleId:1, articleName:'The Power of Vulnerability', zone:'practice', addedAt:NOW-3*DAY,  reviewedAt:null },
-  { id:2,  word:'vulnerability',  phonetic:'/ˌvʌl.nər.əˈbɪl.ɪ.ti/', articleId:1, articleName:'The Power of Vulnerability', zone:'practice', addedAt:NOW-2*DAY,  reviewedAt:null },
-  { id:3,  word:'authentic',      phonetic:'/ɔːˈθen.tɪk/',           articleId:1, articleName:'The Power of Vulnerability', zone:'review',   addedAt:NOW-10*DAY, reviewedAt:NOW-5*DAY },
-  { id:4,  word:'compassion',     phonetic:'/kəmˈpæʃ.ən/',           articleId:1, articleName:'The Power of Vulnerability', zone:'practice', addedAt:NOW-1*DAY,  reviewedAt:null },
-  { id:5,  word:'differentiate',  phonetic:'/ˌdɪf.ərˈen.ʃi.eɪt/',   articleId:2, articleName:'Start With Why',             zone:'practice', addedAt:NOW-4*DAY,  reviewedAt:null },
-  { id:6,  word:'proprietary',    phonetic:'/prəˈpraɪ.ə.ter.i/',     articleId:2, articleName:'Start With Why',             zone:'practice', addedAt:NOW-1*DAY,  reviewedAt:null },
-  { id:7,  word:'neocortex',      phonetic:'/ˌniː.oʊˈkɔːr.teks/',    articleId:2, articleName:'Start With Why',             zone:'review',   addedAt:NOW-8*DAY,  reviewedAt:NOW-6*DAY },
-  { id:8,  word:'limbic',         phonetic:'/ˈlɪm.bɪk/',             articleId:2, articleName:'Start With Why',             zone:'review',   addedAt:NOW-9*DAY,  reviewedAt:NOW-1*DAY },
-  { id:9,  word:'testosterone',   phonetic:'/tesˈtɒs.tər.oʊn/',      articleId:3, articleName:'Your Body Language',         zone:'practice', addedAt:NOW-5*DAY,  reviewedAt:null },
-  { id:10, word:'cortisol',       phonetic:'/ˈkɔːr.tɪ.sɒl/',         articleId:3, articleName:'Your Body Language',         zone:'practice', addedAt:NOW-6*DAY,  reviewedAt:null },
-  { id:11, word:'nonverbal',      phonetic:'/nɒnˈvɜːr.bəl/',         articleId:3, articleName:'Your Body Language',         zone:'review',   addedAt:NOW-12*DAY, reviewedAt:NOW-2*DAY },
-  { id:12, word:'hierarchy',      phonetic:'/ˈhaɪ.ər.ɑːr.ki/',       articleId:2, articleName:'Start With Why',             zone:'practice', addedAt:NOW-7*DAY,  reviewedAt:null }
+  { id:1,  word:'ephemeral',      phonetic:'/ɪˈfɛm.ər.əl/',          articleId:1, articleName:'The Power of Vulnerability', zone:'practice', addedAt:NOW-3*DAY,  reviewedAt:null,         pinnedAt:NOW-1*DAY },
+  { id:2,  word:'vulnerability',  phonetic:'/ˌvʌl.nər.əˈbɪl.ɪ.ti/', articleId:1, articleName:'The Power of Vulnerability', zone:'practice', addedAt:NOW-2*DAY,  reviewedAt:null,         pinnedAt:null },
+  { id:3,  word:'authentic',      phonetic:'/ɔːˈθen.tɪk/',           articleId:1, articleName:'The Power of Vulnerability', zone:'review',   addedAt:NOW-10*DAY, reviewedAt:NOW-5*DAY,    pinnedAt:NOW-3*DAY },
+  { id:4,  word:'compassion',     phonetic:'/kəmˈpæʃ.ən/',           articleId:1, articleName:'The Power of Vulnerability', zone:'practice', addedAt:NOW-1*DAY,  reviewedAt:null,         pinnedAt:null },
+  { id:5,  word:'differentiate',  phonetic:'/ˌdɪf.ərˈen.ʃi.eɪt/',   articleId:2, articleName:'Start With Why',             zone:'practice', addedAt:NOW-4*DAY,  reviewedAt:null,         pinnedAt:null },
+  { id:6,  word:'proprietary',    phonetic:'/prəˈpraɪ.ə.ter.i/',     articleId:2, articleName:'Start With Why',             zone:'practice', addedAt:NOW-1*DAY,  reviewedAt:null,         pinnedAt:null },
+  { id:7,  word:'neocortex',      phonetic:'/ˌniː.oʊˈkɔːr.teks/',    articleId:2, articleName:'Start With Why',             zone:'review',   addedAt:NOW-8*DAY,  reviewedAt:NOW-6*DAY,    pinnedAt:null },
+  { id:8,  word:'limbic',         phonetic:'/ˈlɪm.bɪk/',             articleId:2, articleName:'Start With Why',             zone:'review',   addedAt:NOW-9*DAY,  reviewedAt:NOW-1*DAY,    pinnedAt:null },
+  { id:9,  word:'testosterone',   phonetic:'/tesˈtɒs.tər.oʊn/',      articleId:3, articleName:'Your Body Language',         zone:'practice', addedAt:NOW-5*DAY,  reviewedAt:null,         pinnedAt:null },
+  { id:10, word:'cortisol',       phonetic:'/ˈkɔːr.tɪ.sɒl/',         articleId:3, articleName:'Your Body Language',         zone:'practice', addedAt:NOW-6*DAY,  reviewedAt:null,         pinnedAt:null },
+  { id:11, word:'nonverbal',      phonetic:'/nɒnˈvɜːr.bəl/',         articleId:3, articleName:'Your Body Language',         zone:'review',   addedAt:NOW-12*DAY, reviewedAt:NOW-2*DAY,    pinnedAt:null },
+  { id:12, word:'hierarchy',      phonetic:'/ˈhaɪ.ər.ɑːr.ki/',       articleId:2, articleName:'Start With Why',             zone:'practice', addedAt:NOW-7*DAY,  reviewedAt:null,         pinnedAt:null }
 ];
-
-var masteredCount = 14;
 
 function loadCards() {
   var raw = localStorage.getItem('voxelVocab');
@@ -316,18 +308,13 @@ function saveCards() { localStorage.setItem('voxelVocab', JSON.stringify(cards))
 
 var cards = loadCards();
 
-// Expire review cards older than 7 days → count as mastered
+// Expire review cards older than 7 days → hard delete
 (function processExpired() {
-  var changed = false;
+  var before = cards.length;
   cards = cards.filter(function(c) {
-    if (c.zone === 'review' && c.reviewedAt && (NOW - c.reviewedAt) >= 7 * DAY) {
-      masteredCount++;
-      changed = true;
-      return false;
-    }
-    return true;
+    return !(c.zone === 'review' && c.reviewedAt && (NOW - c.reviewedAt) >= 7 * DAY);
   });
-  if (changed) saveCards();
+  if (cards.length !== before) saveCards();
 })();
 
 var filterArticleId = null;
@@ -351,10 +338,20 @@ function getFiltered() {
 
 // ── RENDER ──
 
+function sortZoneCards(zoneCards) {
+  return zoneCards.slice().sort(function(a, b) {
+    var aPinned = a.pinnedAt ? 1 : 0;
+    var bPinned = b.pinnedAt ? 1 : 0;
+    if (bPinned !== aPinned) return bPinned - aPinned;
+    if (aPinned) return b.pinnedAt - a.pinnedAt;
+    return b.addedAt - a.addedAt;
+  });
+}
+
 function render() {
   var filtered = getFiltered();
-  var practice = filtered.filter(function(c) { return c.zone === 'practice'; });
-  var review   = filtered.filter(function(c) { return c.zone === 'review'; });
+  var practice = sortZoneCards(filtered.filter(function(c) { return c.zone === 'practice'; }));
+  var review   = sortZoneCards(filtered.filter(function(c) { return c.zone === 'review'; }));
   renderZone('practiceCards', 'practiceCount', practice, 'practice');
   renderZone('reviewCards',   'reviewCount',   review,   'review');
   renderSidebar();
@@ -364,8 +361,9 @@ function render() {
 function updateSubtitle() {
   var p = cards.filter(function(c){ return c.zone==='practice'; }).length;
   var r = cards.filter(function(c){ return c.zone==='review'; }).length;
+  var pinned = cards.filter(function(c){ return c.pinnedAt; }).length;
   document.getElementById('topSubtitle').textContent =
-    (p + r) + ' words · ' + r + ' in review · ' + masteredCount + ' mastered';
+    (p + r) + ' words · ' + r + ' in review · ' + pinned + ' pinned';
 }
 
 function renderZone(containerId, countId, zoneCards, zone) {
@@ -414,8 +412,12 @@ function makeCard(card) {
     progressHtml = '<div class="vc-progress"><div class="vc-progress-fill" style="width:' + pct + '%;background:' + pColor + '"></div></div>';
   }
 
+  var isPinned = !!card.pinnedAt;
+  var pinBtnClass = 'vc-btn pin-btn' + (isPinned ? ' pinned' : '');
+  var pinTitle = isPinned ? 'Unpin word' : 'Pin word';
+
   var el = document.createElement('div');
-  el.className = 'vocab-card';
+  el.className = 'vocab-card' + (isPinned ? ' pinned' : '');
   el.draggable = true;
   el.dataset.id = String(card.id);
   el.innerHTML =
@@ -429,6 +431,9 @@ function makeCard(card) {
         '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1V9"/><polyline points="10,1 15,1 15,6"/><line x1="15" y1="1" x2="7" y2="9"/></svg>' +
       '</button>' +
       '<div class="vc-spacer"></div>' +
+      '<button class="' + pinBtnClass + '" title="' + pinTitle + '">' +
+        '<svg viewBox="0 0 16 16" fill="' + (isPinned ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.4"><path d="M9.5 2L14 6.5l-2 2-1.5-1.5L8 9.5V12l-1.5 1.5L5 12V9.5L3 7.5 4.5 6 3 4.5 7.5 2z"/><line x1="5" y1="11" x2="2" y2="14"/></svg>' +
+      '</button>' +
       '<button class="vc-btn danger del-btn" title="Delete word">' +
         '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><polyline points="3,5 13,5"/><path d="M6 5V3h4v2"/><path d="M4 5l1 8h6l1-8"/></svg>' +
       '</button>' +
@@ -453,6 +458,15 @@ function makeCard(card) {
   el.querySelector('.source-btn').addEventListener('click', function(e) {
     e.stopPropagation();
     toast('From: ' + card.articleName);
+  });
+  el.querySelector('.pin-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    var target = cards.find(function(c) { return c.id === card.id; });
+    if (!target) return;
+    target.pinnedAt = target.pinnedAt ? null : Date.now();
+    saveCards();
+    render();
+    toast(target.pinnedAt ? '"' + card.word + '" pinned' : '"' + card.word + '" unpinned');
   });
   el.querySelector('.del-btn').addEventListener('click', function(e) {
     e.stopPropagation();
@@ -499,17 +513,17 @@ setupZoneDrop('reviewCards',   'review');
 function renderSidebar() {
   renderStats();
   renderArticleFilter();
-  renderExpiringSoon();
 }
 
 function renderStats() {
   var p = cards.filter(function(c){ return c.zone==='practice'; }).length;
   var r = cards.filter(function(c){ return c.zone==='review'; }).length;
+  var pinned = cards.filter(function(c){ return c.pinnedAt; }).length;
   document.getElementById('statsGrid').innerHTML =
-    stat(p + r, 'Total',    '') +
-    stat(p,     'Practice', 'teal') +
-    stat(r,     'Review',   'purple') +
-    stat(masteredCount, 'Mastered', 'amber');
+    stat(p + r,  'Total',    '') +
+    stat(p,      'Practice', 'teal') +
+    stat(r,      'Review',   'purple') +
+    stat(pinned, 'Pinned',   'amber');
 }
 function stat(n, label, cls) {
   return '<div class="sb-stat"><div class="sb-stat-num' + (cls ? ' '+cls : '') + '">' + n + '</div><div class="sb-stat-label">' + label + '</div></div>';
@@ -524,6 +538,20 @@ function renderArticleFilter() {
   });
   var articles = Object.keys(map).map(function(k) { return map[k]; });
   list.innerHTML = '';
+
+  // "All Articles" entry — always first, active when no filter
+  var allItem = document.createElement('div');
+  allItem.className = 'sb-article-item' + (filterArticleId === null ? ' active' : '');
+  allItem.innerHTML =
+    '<div class="sb-article-dot"></div>' +
+    '<div class="sb-article-name">All Articles</div>' +
+    '<span class="sb-article-count">' + cards.length + '</span>';
+  allItem.addEventListener('click', function() {
+    filterArticleId = null;
+    render();
+  });
+  list.appendChild(allItem);
+
   articles.forEach(function(a) {
     var item = document.createElement('div');
     item.className = 'sb-article-item' + (filterArticleId === a.id ? ' active' : '');
@@ -536,27 +564,6 @@ function renderArticleFilter() {
       render();
     });
     list.appendChild(item);
-  });
-}
-
-function renderExpiringSoon() {
-  var el = document.getElementById('expiringSoon');
-  var soon = cards.filter(function(c) {
-    return c.zone === 'review' && c.reviewedAt && daysLeft(c) <= 2;
-  });
-  el.innerHTML = '';
-  if (!soon.length) {
-    el.innerHTML = '<div class="expiring-none">No words expiring soon</div>';
-    return;
-  }
-  soon.forEach(function(card) {
-    var dl = daysLeft(card);
-    var item = document.createElement('div');
-    item.className = 'expiring-item';
-    item.innerHTML =
-      '<div class="expiring-word">' + esc(card.word) + '</div>' +
-      '<span class="expiring-pill">' + dl + 'd</span>';
-    el.appendChild(item);
   });
 }
 
@@ -599,6 +606,8 @@ document.getElementById('sbUserRow').addEventListener('click', function() { wind
   var initials = user.name.split(' ').map(function(p){ return p[0]||''; }).join('').slice(0,2).toUpperCase() || '??';
   document.getElementById('sbAvatar').textContent = initials;
   document.getElementById('sbUserName').textContent = user.name;
+  var planLabel = user.plan === 'pro' ? 'Pro Plan' : user.plan === 'max' ? 'Max Plan' : 'Free Plan';
+  document.getElementById('sbUserPlan').textContent = planLabel;
   if (user.avatarUrl) {
     var el = document.getElementById('sbAvatar');
     el.textContent = '';

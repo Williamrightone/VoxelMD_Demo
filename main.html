@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>voxelMD</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <script>if(localStorage.getItem('voxelTheme')==='dark')document.documentElement.className='dark';</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -39,9 +40,59 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .sidebar-logo{font-size:13px;font-weight:500;letter-spacing:-0.2px;color:var(--text-3);margin-bottom:8px;}
 .sidebar-logo em{color:var(--teal);font-style:normal;}
 
-.user-row{display:flex;align-items:center;gap:8px;}
-.avatar{width:24px;height:24px;border-radius:50%;background:var(--purple-light);color:var(--purple);font-size:9px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.user-name{font-size:11px;color:var(--text-2);}
+.user-row{display:flex;align-items:center;gap:8px;padding:6px 4px;border-radius:var(--radius);cursor:pointer;transition:background .12s;}
+.user-row:hover{background:var(--surface2);}
+.avatar{width:24px;height:24px;border-radius:50%;background:var(--purple-light);color:var(--purple);font-size:9px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;background-size:cover;background-position:center;}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:11px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-plan{font-size:10px;color:var(--text-3);}
+.user-chevron{width:10px;height:10px;color:var(--text-3);flex-shrink:0;}
+
+/* ── TOPBAR TITLE INLINE EDIT ── */
+.doc-title-row{display:flex;align-items:center;gap:6px;}
+.doc-title-edit-btn{width:22px;height:22px;border-radius:5px;border:none;background:none;cursor:pointer;color:var(--text-3);display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;opacity:0;}
+.doc-title-row:hover .doc-title-edit-btn{opacity:1;}
+.doc-title-edit-btn:hover{background:var(--surface2);color:var(--teal);}
+.doc-title-edit-btn svg{width:11px;height:11px;}
+.doc-title-input{font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:var(--text);background:var(--surface);border:1px solid var(--teal);border-radius:var(--radius);padding:3px 8px;outline:none;min-width:240px;}
+.doc-title-action-btn{width:24px;height:24px;border-radius:5px;border:1px solid var(--border-md);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:background .12s,color .12s;}
+.doc-title-action-btn:hover{background:var(--surface2);}
+.doc-title-action-btn.confirm:hover{color:var(--teal);border-color:var(--teal-mid);}
+.doc-title-action-btn.cancel:hover{color:var(--red);border-color:var(--red);}
+.doc-title-action-btn svg{width:12px;height:12px;}
+
+/* ── EMPTY STATE CTA ── */
+.empty-state-cta{margin-top:6px;padding:7px 16px;border-radius:var(--radius);background:var(--teal);color:white;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .12s;}
+.empty-state-cta:hover{background:var(--teal-dark);}
+.empty-state-cta svg{width:11px;height:11px;}
+.tree-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;gap:10px;text-align:center;color:var(--text-3);}
+.tree-empty svg{width:32px;height:32px;opacity:0.35;}
+.tree-empty p{font-size:12px;line-height:1.5;}
+
+/* ── LISTEN LOADING + REGENERATE ── */
+.psec-title-with-pulse{display:flex;align-items:center;gap:6px;}
+.tts-pulse{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 1.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.tts-loading-row{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:var(--text-3);}
+.tts-loading-row .tts-mini-spinner{width:11px;height:11px;border:1.5px solid var(--surface2);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;}
+.regen-btn{width:34px;height:34px;border-radius:50%;background:var(--surface2);border:1px solid var(--border-md);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:all .12s;flex-shrink:0;}
+.regen-btn:hover{background:var(--teal-light);color:var(--teal);border-color:var(--teal-mid);}
+.regen-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.regen-btn svg{width:13px;height:13px;}
+.tab-pulse{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--teal);margin-left:5px;animation:pulse 1.2s ease-in-out infinite;vertical-align:middle;}
+
+/* ── RECORD COUNTDOWN + DUAL BUTTONS ── */
+.rec-countdown{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--red);text-align:center;padding:10px 0 6px;letter-spacing:0.04em;}
+.rec-actions-dual{display:flex;gap:6px;}
+.rec-actions-dual .btn{flex:1;justify-content:center;}
+.rec-quota-cta{margin-top:10px;padding:9px 11px;border-radius:var(--radius);background:rgba(186,117,23,0.08);border:1px solid rgba(186,117,23,0.22);font-size:11px;color:var(--amber);line-height:1.5;}
+.rec-quota-cta a{color:var(--amber);font-weight:500;text-decoration:none;}
+.rec-quota-cta a:hover{text-decoration:underline;}
+.rec-unsupported{margin-top:10px;padding:8px 10px;border-radius:var(--radius);background:var(--surface2);font-size:10.5px;color:var(--text-3);line-height:1.5;}
+.rec-row .rec-size{font-size:10px;color:var(--text-3);font-family:'DM Mono',monospace;margin-left:6px;}
+.rec-row .rec-status-badge{font-size:9px;padding:2px 6px;border-radius:10px;background:var(--teal-light);color:var(--teal);font-weight:500;text-transform:uppercase;letter-spacing:0.04em;margin-left:4px;}
+.rec-row .rec-status-badge.uploading{background:rgba(254,188,46,0.12);color:var(--amber);}
+.rec-row .rec-status-badge.uploading::before{content:'';display:inline-block;width:6px;height:6px;border:1.2px solid var(--amber);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;margin-right:4px;vertical-align:middle;}
 
 .sidebar-body{flex:1;overflow-y:auto;padding:10px 8px;}
 .sidebar-body::-webkit-scrollbar{width:4px;}
@@ -367,6 +418,15 @@ html.dark .delws-type-input{background:var(--surface2);}
 .btn-del-final.loading .del-label{display:none;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
+/* ── RIGHT PANEL TABS ── */
+.rp-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.rp-tab-btn{flex:1;padding:10px 0;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text-3);background:none;border:none;cursor:pointer;transition:color .12s,border-color .12s;border-bottom:2px solid transparent;}
+.rp-tab-btn:hover{color:var(--text-2);}
+.rp-tab-btn.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:500;}
+.rp-tab-body{display:none;flex-direction:column;overflow:hidden;flex:1;min-height:0;}
+.rp-tab-body.active{display:flex;}
+.rp-tab-body .panel-section.grow{flex:1;}
+
 /* ── DELETE ARTICLE / FOLDER MODALS ── */
 .del-item-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:400;align-items:center;justify-content:center;}
 .del-item-overlay.show{display:flex;}
@@ -405,9 +465,13 @@ html.dark .delws-type-input{background:var(--surface2);}
         <div class="ws-name-sm" id="wsNameSm">TED Talks</div>
       </div>
       <div style="height:10px"></div>
-      <div class="user-row">
+      <div class="user-row" id="mainUserRow">
         <div class="avatar" id="mainAvatar">WW</div>
-        <div class="user-name" id="mainUserName">William Wu</div>
+        <div class="user-info">
+          <div class="user-name" id="mainUserName">William Wu</div>
+          <div class="user-plan" id="mainUserPlan">Free Plan</div>
+        </div>
+        <svg class="user-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><polyline points="6,4 10,8 6,12"/></svg>
       </div>
     </div>
     <div class="sidebar-body">
@@ -439,7 +503,12 @@ html.dark .delws-type-input{background:var(--surface2);}
   <div class="main">
     <div class="topbar">
       <div>
-        <div class="doc-title" id="docTitle">Select an article</div>
+        <div class="doc-title-row" id="docTitleRow">
+          <div class="doc-title" id="docTitle">Select an article</div>
+          <button class="doc-title-edit-btn" id="docTitleEditBtn" title="Rename article" style="display:none;">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11 2l3 3-8 8H3v-3L11 2z"/></svg>
+          </button>
+        </div>
         <div class="doc-meta" id="docMeta">Choose from the library or create a new one</div>
       </div>
       <div class="topbar-actions">
@@ -474,64 +543,112 @@ html.dark .delws-type-input{background:var(--surface2);}
           <textarea class="editor-textarea" id="editorTextarea" placeholder="# Title&#10;&#10;Write or paste your English content here..."></textarea>
         </div>
         <div class="preview-pane" id="previewPane" style="display:none">
-          <div class="pane-label">Preview — select any word or phrase to add to dictionary</div>
+          <div class="pane-label">Preview — select a word to add to dictionary</div>
           <div class="preview-scroll"><div class="md-preview" id="mdPreview"></div></div>
         </div>
       </div>
 
       <div class="right-panel">
-        <div class="panel-section">
-          <div class="psec-title">AI Reader</div>
-          <select class="voice-select" id="voiceSelect">
-            <option value="af_bella">af_bella — American female</option>
-            <option value="am_adam">am_adam — American male</option>
-            <option value="bf_emma">bf_emma — British female</option>
-            <option value="bm_george">bm_george — British male</option>
-          </select>
-          <div class="play-controls">
-            <button class="play-btn" id="playBtn"><svg id="playIcon" viewBox="0 0 16 16"><polygon points="5,3 13,8 5,13"/></svg></button>
-            <div class="progress-wrap">
-              <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-              <div class="time-row"><span class="time-lbl" id="timeNow">0:00</span><span class="time-lbl" id="timeTotal">0:00</span></div>
+        <!-- Tab buttons -->
+        <div class="rp-tabs">
+          <button class="rp-tab-btn active" data-tab="listen">Listen</button>
+          <button class="rp-tab-btn" data-tab="record">Record</button>
+          <button class="rp-tab-btn" data-tab="vocab">Vocab</button>
+        </div>
+
+        <!-- Listen tab -->
+        <div class="rp-tab-body active" id="rp-tab-listen">
+          <div class="panel-section" style="overflow-y:auto;flex:1;">
+            <div class="psec-title psec-title-with-pulse">
+              <span>AI Reader</span>
+              <span class="tts-pulse" id="ttsPulse" style="display:none;"></span>
+            </div>
+            <select class="voice-select" id="voiceSelect">
+              <option value="af_bella">af_bella — American female</option>
+              <option value="am_adam">am_adam — American male</option>
+              <option value="bf_emma">bf_emma — British female</option>
+              <option value="bm_george">bm_george — British male</option>
+            </select>
+            <div class="play-controls">
+              <button class="play-btn" id="playBtn"><svg id="playIcon" viewBox="0 0 16 16"><polygon points="5,3 13,8 5,13"/></svg></button>
+              <div class="progress-wrap">
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="time-row"><span class="time-lbl" id="timeNow">0:00</span><span class="time-lbl" id="timeTotal">0:00</span></div>
+              </div>
+              <button class="regen-btn" id="regenBtn" title="Force a fresh narration — discards cached audio for the current voice">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="14,2 14,6 10,6"/><path d="M14 6a6 6 0 10-1.5 5.5"/></svg>
+              </button>
+            </div>
+            <div class="tts-loading-row" id="ttsLoadingRow" style="display:none;">
+              <div class="tts-mini-spinner"></div>
+              <span>Generating audio…</span>
+            </div>
+            <div class="speed-row">
+              <span class="speed-lbl">Speed</span>
+              <div class="speed-btns">
+                <button class="spd" data-speed="0.75">0.75x</button>
+                <button class="spd active" data-speed="1">1x</button>
+                <button class="spd" data-speed="1.25">1.25x</button>
+                <button class="spd" data-speed="1.5">1.5x</button>
+              </div>
+            </div>
+            <div class="tts-info">
+              <div class="tts-badge"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="3" width="10" height="7" rx="1"/><line x1="3" y1="1" x2="3" y2="3"/><line x1="9" y1="1" x2="9" y2="3"/></svg>skip code</div>
+              <div class="tts-badge"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="2" width="10" height="8" rx="1"/><line x1="4" y1="5" x2="8" y2="5"/></svg>skip images</div>
             </div>
           </div>
-          <div class="speed-row">
-            <span class="speed-lbl">Speed</span>
-            <div class="speed-btns">
-              <button class="spd" data-speed="0.75">0.75x</button>
-              <button class="spd active" data-speed="1">1x</button>
-              <button class="spd" data-speed="1.25">1.25x</button>
-              <button class="spd" data-speed="1.5">1.5x</button>
+        </div>
+
+        <!-- Record tab -->
+        <div class="rp-tab-body" id="rp-tab-record">
+          <div class="panel-section" style="flex-shrink:0;">
+            <div class="psec-title">My Recording</div>
+
+            <!-- Idle: Start recording button -->
+            <button class="btn danger" id="recStartBtn" style="width:100%;justify-content:center;gap:8px">
+              <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>Start recording
+            </button>
+
+            <!-- Recording: Countdown + Cancel/Stop dual buttons -->
+            <div id="recActiveBlock" style="display:none;">
+              <div class="rec-countdown" id="recCountdown">5:00</div>
+              <div class="waveform active" id="waveform">
+                <div class="wb" style="height:8px"></div><div class="wb" style="height:14px"></div><div class="wb" style="height:20px"></div>
+                <div class="wb" style="height:10px"></div><div class="wb" style="height:24px"></div><div class="wb" style="height:16px"></div>
+                <div class="wb" style="height:8px"></div><div class="wb" style="height:22px"></div><div class="wb" style="height:18px"></div>
+                <div class="wb" style="height:14px"></div><div class="wb" style="height:26px"></div><div class="wb" style="height:10px"></div>
+                <div class="wb" style="height:16px"></div><div class="wb" style="height:20px"></div><div class="wb" style="height:12px"></div>
+              </div>
+              <div class="rec-actions-dual" style="margin-top:10px;">
+                <button class="btn" id="recCancelBtn">Cancel</button>
+                <button class="btn danger recording" id="recStopBtn">
+                  <svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/></svg>Stop
+                </button>
+              </div>
+            </div>
+
+            <!-- Quota CTA (shown when at limit) -->
+            <div class="rec-quota-cta" id="recQuotaCta" style="display:none;">
+              You've reached the 5 recording limit on the Free plan. Upgrade to Pro for 10-minute recordings and a higher quota. <a href="profile.html">Upgrade →</a>
+            </div>
+
+            <!-- Browser unsupported note (hidden by default in happy path) -->
+            <div class="rec-unsupported" id="recUnsupported" style="display:none;">
+              Recording is not supported in this browser.
             </div>
           </div>
-          <div class="tts-info">
-            <div class="tts-badge"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="3" width="10" height="7" rx="1"/><line x1="3" y1="1" x2="3" y2="3"/><line x1="9" y1="1" x2="9" y2="3"/></svg>skip code</div>
-            <div class="tts-badge"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="2" width="10" height="8" rx="1"/><line x1="4" y1="5" x2="8" y2="5"/></svg>skip images</div>
+          <div class="panel-section grow">
+            <div class="psec-title">Saved recordings<span class="psec-count" id="recCount">0</span></div>
+            <div class="rec-list" id="recordingsList"></div>
           </div>
         </div>
 
-        <div class="panel-section">
-          <div class="psec-title">My Recording</div>
-          <button class="btn danger" id="recBtn" style="width:100%;justify-content:center;gap:8px">
-            <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>Start recording
-          </button>
-          <div class="waveform" id="waveform">
-            <div class="wb" style="height:8px"></div><div class="wb" style="height:14px"></div><div class="wb" style="height:20px"></div>
-            <div class="wb" style="height:10px"></div><div class="wb" style="height:24px"></div><div class="wb" style="height:16px"></div>
-            <div class="wb" style="height:8px"></div><div class="wb" style="height:22px"></div><div class="wb" style="height:18px"></div>
-            <div class="wb" style="height:14px"></div><div class="wb" style="height:26px"></div><div class="wb" style="height:10px"></div>
-            <div class="wb" style="height:16px"></div><div class="wb" style="height:20px"></div><div class="wb" style="height:12px"></div>
+        <!-- Vocab tab -->
+        <div class="rp-tab-body" id="rp-tab-vocab">
+          <div class="panel-section grow">
+            <div class="psec-title">Vocabulary<span class="psec-count" id="vocabCount">0</span></div>
+            <div class="vocab-grid" id="vocabGrid"></div>
           </div>
-        </div>
-
-        <div class="panel-section scrollable">
-          <div class="psec-title">Saved recordings<span class="psec-count" id="recCount">0</span></div>
-          <div class="rec-list" id="recordingsList"></div>
-        </div>
-
-        <div class="panel-section grow">
-          <div class="psec-title">Vocabulary<span class="psec-count" id="vocabCount">0</span></div>
-          <div class="vocab-grid" id="vocabGrid"></div>
         </div>
       </div>
     </div>
@@ -647,6 +764,24 @@ html.dark .delws-type-input{background:var(--surface2);}
           <div class="upload-zone-sub">JPG · PNG · WebP · HEIC · GIF</div>
         </div>
         <input type="file" id="photoFileInput" accept="image/*" style="display:none">
+
+        <!-- Selected (idle → user must click Upload to start) -->
+        <div class="upload-progress" id="photoSelected" style="display:none;flex-direction:column;gap:10px;">
+          <div class="upload-file-row">
+            <div class="upload-thumb" id="photoSelThumb">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="2" width="14" height="12" rx="1"/><circle cx="5.5" cy="6" r="1.5"/><polyline points="1,11 5,7 8,10 11,8 15,12"/></svg>
+            </div>
+            <div class="upload-file-meta">
+              <div class="upload-file-name" id="photoSelName">photo.jpg</div>
+              <div class="upload-file-size" id="photoSelSize">—</div>
+            </div>
+          </div>
+          <button class="upload-copy-btn" id="photoStartUploadBtn" style="background:var(--teal);color:white;border-color:var(--teal);">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="5,8 8,5 11,8"/><line x1="8" y1="5" x2="8" y2="13"/></svg>
+            Upload Photo
+          </button>
+        </div>
+
         <div class="upload-progress" id="photoProgress">
           <div class="upload-file-row">
             <div class="upload-thumb" id="photoThumb">
@@ -664,7 +799,7 @@ html.dark .delws-type-input{background:var(--surface2);}
           </div>
         </div>
         <div class="upload-result" id="photoResult">
-          <div class="upload-result-lbl">Markdown syntax — paste into editor</div>
+          <div class="upload-result-lbl">Markdown syntax — inserted into editor</div>
           <div class="upload-result-code" id="photoResultCode"></div>
           <button class="upload-copy-btn" id="photoCopyBtn">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1"/><path d="M3 11V3h8"/></svg>
@@ -790,6 +925,16 @@ html.dark .delws-type-input{background:var(--surface2);}
 <script>
 marked.setOptions({breaks:true,gfm:true});
 
+// ── RIGHT PANEL TABS ──
+document.querySelectorAll('.rp-tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.rp-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.rp-tab-body').forEach(function(p){ p.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('rp-tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
 // ── THEME ──
 document.getElementById('themeToggle').addEventListener('click', function() {
   var isDark = document.documentElement.classList.toggle('dark');
@@ -811,9 +956,19 @@ document.getElementById('themeToggle').addEventListener('click', function() {
   if (!raw) return;
   var user = JSON.parse(raw);
   var initials = user.name.split(' ').map(function(p){return p[0]||'';}).join('').slice(0,2).toUpperCase() || '??';
-  document.getElementById('mainAvatar').textContent = initials;
+  var av = document.getElementById('mainAvatar');
+  av.textContent = initials;
+  if (user.avatarUrl) {
+    av.textContent = '';
+    av.style.backgroundImage = 'url(' + user.avatarUrl + ')';
+  }
   document.getElementById('mainUserName').textContent = user.name;
+  document.getElementById('mainUserPlan').textContent = (user.plan || 'Free') + ' Plan';
 })();
+
+document.getElementById('mainUserRow').addEventListener('click', function() {
+  window.location.href = 'profile.html';
+});
 
 document.getElementById('backBtn').addEventListener('click', function(){
   window.location.href = 'home.html';
@@ -882,73 +1037,149 @@ function svgPlus(){return'<svg viewBox="0 0 12 12" fill="none" stroke="currentCo
 function svgTrash(){return'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><polyline points="3,5 13,5"/><path d="M6 5V3h4v2"/><path d="M4 5l1 8h6l1-8"/></svg>';}
 
 // ── TREE ──
-function renderTree(nodes,container){
+// 2-level hierarchy: root → folder → article (sub-folders not allowed inside folders)
+function renderTree(nodes,container,depth){
   container.innerHTML='';
+  depth=depth||0;
   nodes.forEach(function(node){
     if(node.type==='folder'){
       var wrap=document.createElement('div');
       var row=document.createElement('div');
       row.className='tree-item';row.dataset.id=node.id;
-      row.innerHTML='<div class="tree-toggle">'+svgChevron(node.open)+'</div><div class="item-icon">'+svgFolder()+'</div><div class="item-label">'+escHtml(node.label)+'</div><div class="item-actions"><button class="icon-btn add-child-btn" data-id="'+node.id+'">'+svgPlus()+'</button><button class="icon-btn del-node-btn">'+svgTrash()+'</button></div>';
+      row.innerHTML='<div class="tree-toggle">'+svgChevron(node.open)+'</div><div class="item-icon">'+svgFolder()+'</div><div class="item-label">'+escHtml(node.label)+'</div><div class="item-actions"><button class="icon-btn add-child-btn" data-id="'+node.id+'" title="Add to '+escHtml(node.label)+'">'+svgPlus()+'</button><button class="icon-btn del-node-btn">'+svgTrash()+'</button></div>';
       wrap.appendChild(row);
-      if(node.open&&node.children){var ch=document.createElement('div');ch.className='tree-children';renderTree(node.children,ch);wrap.appendChild(ch);}
+      if(node.open&&node.children){var ch=document.createElement('div');ch.className='tree-children';renderTree(node.children,ch,depth+1);wrap.appendChild(ch);}
       container.appendChild(wrap);
       row.querySelector('.tree-toggle').addEventListener('click',function(e){e.stopPropagation();node.open=!node.open;renderAll();});
       row.addEventListener('click',function(e){if(e.target.closest('.icon-btn'))return;node.open=!node.open;renderAll();});
-      row.querySelector('.add-child-btn').addEventListener('click',function(e){e.stopPropagation();showDropdown(node.id,this);});
+      // Sub-folders inside a folder cannot have nested folders → only article option
+      row.querySelector('.add-child-btn').addEventListener('click',function(e){e.stopPropagation();showDropdown(node.id,this,/*onlyArticle=*/true);});
       row.querySelector('.del-node-btn').addEventListener('click',function(e){e.stopPropagation();openDelFolderModal(node);});
     } else {
       var drow=document.createElement('div');
       drow.className='tree-item'+(node.id===state.activeDocId?' active':'');drow.dataset.id=node.id;
       drow.innerHTML='<div class="tree-toggle"></div><div class="item-icon">'+svgDoc()+'</div><div class="item-label">'+escHtml(node.label)+'</div><div class="item-actions"><button class="icon-btn del-node-btn">'+svgTrash()+'</button></div>';
       container.appendChild(drow);
-      drow.addEventListener('click',function(e){if(e.target.closest('.icon-btn'))return;state.activeDocId=node.id;stopPlay();stopRec();renderAll();updateMainPanel();});
+      drow.addEventListener('click',function(e){if(e.target.closest('.icon-btn'))return;state.activeDocId=node.id;stopPlay();stopRec(false);renderAll();updateMainPanel();});
       drow.querySelector('.del-node-btn').addEventListener('click',function(e){e.stopPropagation();openDelArticleModal(node);});
     }
   });
 }
-function renderAll(){renderTree(state.tree,document.getElementById('tree'));}
+function renderTreeEmpty(container){
+  container.innerHTML=
+    '<div class="tree-empty">'+
+      '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="6" y="4" width="28" height="32" rx="3"/><line x1="12" y1="14" x2="28" y2="14"/><line x1="12" y1="20" x2="24" y2="20"/><line x1="12" y1="26" x2="20" y2="26"/></svg>'+
+      '<p>No articles yet</p>'+
+      '<button class="empty-state-cta" id="treeEmptyCta">'+
+        '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg>'+
+        'Create your first article'+
+      '</button>'+
+    '</div>';
+  document.getElementById('treeEmptyCta').addEventListener('click',function(){openArticleModal(null);});
+}
+function renderAll(){
+  var c=document.getElementById('tree');
+  if(!state.tree||state.tree.length===0){renderTreeEmpty(c);}
+  else{renderTree(state.tree,c,0);}
+}
 
 // ── PREVIEW ──
 function updatePreview(md){document.getElementById('mdPreview').innerHTML=marked.parse(md||'');}
-document.getElementById('editorTextarea').addEventListener('input',function(){var doc=activeDoc();if(doc){doc.content=this.value;updatePreview(this.value);}});
+document.getElementById('editorTextarea').addEventListener('input',function(){var doc=activeDoc();if(doc){doc.content=this.value;doc.updatedAt=new Date().toISOString();updatePreview(this.value);}});
 
 // ── MAIN PANEL ──
+function formatLastUpdated(date){
+  var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return mo[date.getMonth()]+' '+date.getDate()+', '+date.getFullYear();
+}
+
 function updateMainPanel(){
   var doc=activeDoc();
   var ep=document.getElementById('editorPane'),pp=document.getElementById('previewPane');
   var mb=document.getElementById('modeBtn'),pb=document.getElementById('playAllBtn'),sb=document.getElementById('shareBtn');
+  var editBtn=document.getElementById('docTitleEditBtn');
+  var titleEl=document.getElementById('docTitle');
   if(!doc){
-    document.getElementById('docTitle').textContent='Select an article';
+    if(titleEl)titleEl.textContent='Select an article';
     document.getElementById('docMeta').textContent='Choose from the library or create a new one';
     document.getElementById('emptyState').style.display='flex';ep.style.display='none';pp.style.display='none';
     mb.style.display='none';pb.style.display='none';sb.style.display='none';
+    if(editBtn)editBtn.style.display='none';
     renderRecordings([]);renderVocab([]);return;
   }
-  document.getElementById('docTitle').textContent=doc.label;
-  var wc=extractTTSText(doc.content||'').trim().split(/\s+/).filter(Boolean).length;
-  document.getElementById('docMeta').textContent=wc+' readable words · '+(doc.recordings||[]).length+' recording'+((doc.recordings||[]).length!==1?'s':'')+' · '+(doc.vocab||[]).length+' vocab';
+  if(titleEl)titleEl.textContent=doc.label;
+  var lastUpdated=doc.updatedAt?new Date(doc.updatedAt):new Date();
+  document.getElementById('docMeta').textContent='Last updated '+formatLastUpdated(lastUpdated);
   document.getElementById('emptyState').style.display='none';ep.style.display='flex';pp.style.display='flex';mb.style.display='';pb.style.display='';sb.style.display='';
+  if(editBtn)editBtn.style.display='';
   document.getElementById('editorTextarea').value=doc.content||'';
   updatePreview(doc.content||'');
   renderRecordings(doc.recordings||[]);
   renderVocab(doc.vocab||[]);
+  if(typeof refreshQuotaCta==='function')refreshQuotaCta();
 }
 
+// ── DOC TITLE INLINE EDIT ──
+function startTitleEdit(){
+  var doc=activeDoc();if(!doc)return;
+  var row=document.getElementById('docTitleRow');
+  row.innerHTML='<input type="text" class="doc-title-input" id="docTitleInput" value="'+escHtml(doc.label)+'">'+
+    '<button class="doc-title-action-btn confirm" id="docTitleConfirmBtn" title="Save"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,8 7,12 13,4"/></svg></button>'+
+    '<button class="doc-title-action-btn cancel" id="docTitleCancelBtn" title="Cancel"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg></button>';
+  var input=document.getElementById('docTitleInput');input.focus();input.select();
+  function commit(save){
+    var newLabel=save?input.value.trim():null;
+    if(save&&newLabel&&newLabel!==doc.label){
+      doc.label=newLabel;doc.updatedAt=new Date().toISOString();
+      renderAll();
+    }
+    restoreTitleRow();
+    if(save&&newLabel)toast('Article renamed');
+  }
+  document.getElementById('docTitleConfirmBtn').addEventListener('click',function(){commit(true);});
+  document.getElementById('docTitleCancelBtn').addEventListener('click',function(){commit(false);});
+  input.addEventListener('keydown',function(e){if(e.key==='Enter')commit(true);else if(e.key==='Escape')commit(false);});
+}
+function restoreTitleRow(){
+  var doc=activeDoc();
+  var row=document.getElementById('docTitleRow');
+  row.innerHTML='<div class="doc-title" id="docTitle">'+escHtml(doc?doc.label:'Select an article')+'</div>'+
+    '<button class="doc-title-edit-btn" id="docTitleEditBtn" title="Rename article"'+(doc?'':' style="display:none;"')+'><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11 2l3 3-8 8H3v-3L11 2z"/></svg></button>';
+  document.getElementById('docTitleEditBtn').addEventListener('click',startTitleEdit);
+  updateMainPanel();
+}
+document.getElementById('docTitleEditBtn').addEventListener('click',startTitleEdit);
+
 // ── RECORDINGS ──
+function fmtBytes(bytes){
+  if(!bytes)return '';
+  if(bytes<1024)return bytes+' B';
+  if(bytes<1048576)return(bytes/1024).toFixed(0)+' KB';
+  return(bytes/1048576).toFixed(1)+' MB';
+}
+function normalizeRec(r){
+  if(typeof r==='string'){var p=r.split('|');return{label:p[0],duration:p[1]||'0:00',sizeBytes:0,uploadStatus:'ok'};}
+  return r;
+}
 function renderRecordings(recs){
   var list=document.getElementById('recordingsList');
   document.getElementById('recCount').textContent=recs.length;
   if(!recs.length){list.innerHTML='<div style="font-size:11px;color:var(--text-3);text-align:center;padding:8px 0;">No recordings yet</div>';return;}
-  list.innerHTML=recs.map(function(r,i){var p=r.split('|');return'<div class="rec-row" data-i="'+i+'"><div class="rec-info"><div class="rec-name">'+escHtml(p[0])+'</div><div class="rec-time">'+(p[1]||'0:00')+'</div></div><button class="rec-play"><svg viewBox="0 0 16 16"><polygon points="4,2 13,8 4,14"/></svg></button><button class="rec-del">'+svgTrash()+'</button></div>';}).join('');
-  list.querySelectorAll('.rec-del').forEach(function(btn){btn.addEventListener('click',function(){var i=parseInt(this.closest('.rec-row').dataset.i);var doc=activeDoc();if(doc){doc.recordings.splice(i,1);renderRecordings(doc.recordings);toast('Recording deleted');}});});
+  list.innerHTML=recs.map(function(r,i){
+    var rec=normalizeRec(r);
+    var sizeHtml=rec.sizeBytes?'<span class="rec-size">'+fmtBytes(rec.sizeBytes)+'</span>':'';
+    var statusBadge='';
+    if(rec.uploadStatus==='uploading')statusBadge='<span class="rec-status-badge uploading">Uploading…</span>';
+    return '<div class="rec-row" data-i="'+i+'"><div class="rec-info"><div class="rec-name">'+escHtml(rec.label)+statusBadge+'</div><div class="rec-time">'+rec.duration+sizeHtml+'</div></div><button class="rec-play"><svg viewBox="0 0 16 16"><polygon points="4,2 13,8 4,14"/></svg></button><button class="rec-del">'+svgTrash()+'</button></div>';
+  }).join('');
+  list.querySelectorAll('.rec-del').forEach(function(btn){btn.addEventListener('click',function(){var i=parseInt(this.closest('.rec-row').dataset.i);var doc=activeDoc();if(doc){doc.recordings.splice(i,1);renderRecordings(doc.recordings);refreshQuotaCta();toast('Recording deleted');}});});
 }
 
 // ── VOCABULARY ──
 function renderVocab(vocab){
   var grid=document.getElementById('vocabGrid');
   document.getElementById('vocabCount').textContent=vocab.length;
-  if(!vocab.length){grid.innerHTML='<div class="vocab-empty">Select any word or phrase in the preview pane<br><span class="vocab-tip">A popup will appear with options</span></div>';return;}
+  if(!vocab.length){grid.innerHTML='<div class="vocab-empty">Select any word in the preview<br><span class="vocab-tip">A popup will appear with options</span></div>';return;}
   grid.innerHTML=vocab.map(function(v,i){
     return'<div class="vocab-card" data-i="'+i+'" data-word="'+escHtml(v.word)+'">'+
       '<button class="vocab-del">'+svgTrash()+'</button>'+
@@ -1037,10 +1268,17 @@ document.getElementById('modeBtn').addEventListener('click',function(){
 });
 
 // ── DROPDOWN ──
-function showDropdown(pid,el){
+function showDropdown(pid,el,onlyArticle){
   state.pendingParentId=pid;
   var ov=document.getElementById('dropdownOverlay'),dd=document.getElementById('dropdown');
-  document.getElementById('dropdownTitle').textContent=pid?'Add to folder':'Add to library';
+  if(pid){
+    var node=findNode(state.tree,pid);
+    document.getElementById('dropdownTitle').textContent='Add to '+(node?node.label:'folder');
+  } else {
+    document.getElementById('dropdownTitle').textContent='Add to library';
+  }
+  // Sub-folders cannot contain folders — hide "New folder" option
+  document.getElementById('ddFolder').style.display=onlyArticle?'none':'';
   ov.classList.add('show');var rect=el.getBoundingClientRect();
   dd.style.top=(rect.bottom+4)+'px';dd.style.left=Math.min(rect.left,window.innerWidth-200)+'px';
 }
@@ -1071,7 +1309,7 @@ document.getElementById('saveArticleBtn').addEventListener('click',function(){
   var title=document.getElementById('articleTitleInput').value.trim();
   var content=document.getElementById('articleContentInput').value.trim();
   if(!title){document.getElementById('articleTitleInput').focus();return;}
-  var nn={id:++state.idCounter,type:'doc',label:title,content:content,recordings:[],vocab:[]};
+  var nn={id:++state.idCounter,type:'doc',label:title,content:content,recordings:[],vocab:[],updatedAt:new Date().toISOString()};
   if(pap){var p=findNode(state.tree,pap);if(p){p.children.push(nn);p.open=true;}}else state.tree.push(nn);
   state.activeDocId=nn.id;document.getElementById('articleModalOverlay').classList.remove('show');
   renderAll();updateMainPanel();toast('Article created');
@@ -1179,31 +1417,91 @@ document.getElementById('playAllBtn').addEventListener('click',function(){state.
 document.getElementById('playBtn').addEventListener('click',function(){state.isPlaying?stopPlay():startPlay();});
 document.querySelectorAll('.spd').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.spd').forEach(function(x){x.classList.remove('active');});this.classList.add('active');if(state.isPlaying){stopPlay();startPlay();}});});
 
+// ── REGENERATE TTS (force-fresh) ──
+function showTtsLoading(show){
+  document.getElementById('ttsLoadingRow').style.display=show?'flex':'none';
+  document.getElementById('ttsPulse').style.display=show?'inline-block':'none';
+  document.getElementById('regenBtn').disabled=show;
+  // Add tab pulse
+  var listenTab=document.querySelector('.rp-tab-btn[data-tab="listen"]');
+  var existing=listenTab.querySelector('.tab-pulse');
+  if(show&&!existing){var p=document.createElement('span');p.className='tab-pulse';listenTab.appendChild(p);}
+  else if(!show&&existing){existing.remove();}
+}
+document.getElementById('regenBtn').addEventListener('click',function(){
+  var doc=activeDoc();if(!doc){toast('Select an article first');return;}
+  stopPlay();
+  showTtsLoading(true);
+  setTimeout(function(){
+    showTtsLoading(false);
+    toast('Audio regenerated');
+    startPlay();
+  },1500);
+});
+
 // ── RECORDING ──
-function stopRec(){
+// Free plan limit: 5 minutes per recording, 5 total recordings.
+var REC_MAX_SECONDS=300; // 5:00 (Free plan)
+var REC_QUOTA_MAX=5;
+
+function showRecActiveBlock(show){
+  document.getElementById('recActiveBlock').style.display=show?'block':'none';
+  document.getElementById('recStartBtn').style.display=show?'none':'';
+}
+function updateRecCountdown(){
+  var remaining=Math.max(0,REC_MAX_SECONDS-state.recSeconds);
+  var m=Math.floor(remaining/60),s=remaining%60;
+  document.getElementById('recCountdown').textContent=m+':'+(s<10?'0':'')+s;
+}
+function refreshQuotaCta(){
+  var doc=activeDoc();
+  var atLimit=doc&&(doc.recordings||[]).length>=REC_QUOTA_MAX;
+  document.getElementById('recQuotaCta').style.display=atLimit?'block':'none';
+  document.getElementById('recStartBtn').disabled=!!atLimit;
+  document.getElementById('recStartBtn').style.opacity=atLimit?'0.5':'';
+}
+function stopRec(saveTake){
   clearInterval(state.recInterval);clearInterval(state.waveInterval);
+  var wasRecording=state.isRecording;
+  var seconds=state.recSeconds;
   state.isRecording=false;state.recSeconds=0;
-  var btn=document.getElementById('recBtn');
-  btn.classList.remove('recording');btn.innerHTML='<svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Start recording';
+  showRecActiveBlock(false);
   document.getElementById('waveform').classList.remove('active');
   var h=[8,14,20,10,24,16,8,22,18,14,26,10,16,20,12];
   document.querySelectorAll('.wb').forEach(function(b,i){b.style.height=h[i]+'px';});
-}
-document.getElementById('recBtn').addEventListener('click',function(){
-  var doc=activeDoc();if(!doc){toast('Select an article first');return;}
-  if(state.isRecording){
-    var dur=formatTime(state.recSeconds);var now=new Date();
+  if(wasRecording&&saveTake){
+    var doc=activeDoc();if(!doc)return;
+    var dur=formatTime(seconds);var now=new Date();
     var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    doc.recordings.unshift('Take '+(doc.recordings.length+1)+' — '+mo[now.getMonth()]+' '+now.getDate()+'|'+dur);
-    stopRec();renderRecordings(doc.recordings);toast('Recording saved');
-  } else {
-    state.isRecording=true;state.recSeconds=0;
-    this.classList.add('recording');this.innerHTML='<svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/></svg> Stop recording';
-    document.getElementById('waveform').classList.add('active');
-    state.recInterval=setInterval(function(){state.recSeconds++;},1000);
-    state.waveInterval=setInterval(function(){document.querySelectorAll('.wb').forEach(function(b){b.style.height=(6+Math.random()*22)+'px';});},120);
+    var label='Take '+((doc.recordings||[]).length+1)+' — '+mo[now.getMonth()]+' '+now.getDate();
+    var sizeBytes=Math.round(seconds*16000); // ~16KB/s mock
+    var rec={label:label,duration:dur,sizeBytes:sizeBytes,createdAt:now.toISOString(),uploadStatus:'uploading'};
+    doc.recordings=doc.recordings||[];
+    doc.recordings.unshift(rec);
+    renderRecordings(doc.recordings);
+    refreshQuotaCta();
+    // Simulate upload completion (happy path)
+    setTimeout(function(){rec.uploadStatus='ok';renderRecordings(doc.recordings);toast('Recording saved');},1200);
   }
+}
+
+document.getElementById('recStartBtn').addEventListener('click',function(){
+  var doc=activeDoc();if(!doc){toast('Select an article first');return;}
+  if((doc.recordings||[]).length>=REC_QUOTA_MAX){toast('Recording quota reached on Free plan');return;}
+  state.isRecording=true;state.recSeconds=0;
+  showRecActiveBlock(true);
+  updateRecCountdown();
+  state.recInterval=setInterval(function(){
+    state.recSeconds++;
+    updateRecCountdown();
+    if(state.recSeconds>=REC_MAX_SECONDS){stopRec(true);}
+  },1000);
+  state.waveInterval=setInterval(function(){
+    document.querySelectorAll('#waveform .wb').forEach(function(b){b.style.height=(6+Math.random()*22)+'px';});
+  },120);
 });
+document.getElementById('recStopBtn').addEventListener('click',function(){stopRec(true);});
+document.getElementById('recCancelBtn').addEventListener('click',function(){stopRec(false);toast('Recording discarded');});
 
 // ── SESSION INIT ──
 // sessionStorage clears on browser/tab close, ensuring uploaded media is tied to current session.
@@ -1256,7 +1554,7 @@ var photoInput=document.getElementById('photoFileInput');
 
 photoZone.addEventListener('click',function(){photoInput.click();});
 photoInput.addEventListener('change',function(){
-  if(this.files&&this.files[0])handlePhotoFile(this.files[0]);
+  if(this.files&&this.files[0])selectPhotoFile(this.files[0]);
 });
 ['dragenter','dragover'].forEach(function(ev){
   photoZone.addEventListener(ev,function(e){e.preventDefault();photoZone.classList.add('dragover');});
@@ -1266,8 +1564,30 @@ photoZone.addEventListener('drop',function(e){
   e.preventDefault();
   photoZone.classList.remove('dragover');
   var file=e.dataTransfer.files[0];
-  if(file&&file.type.startsWith('image/'))handlePhotoFile(file);
+  if(file&&file.type.startsWith('image/'))selectPhotoFile(file);
   else if(file)toast('Please drop an image file');
+});
+
+// Two-stage flow: select → user clicks Upload Photo → upload starts
+var _selectedPhoto=null;
+function selectPhotoFile(file){
+  _selectedPhoto=file;
+  photoZone.style.display='none';
+  document.getElementById('photoSelName').textContent=file.name;
+  document.getElementById('photoSelSize').textContent=fmtSize(file.size);
+  // Selected thumb preview
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    document.getElementById('photoSelThumb').innerHTML='<img src="'+ev.target.result+'" alt="">';
+  };
+  reader.readAsDataURL(file);
+  document.getElementById('photoSelected').style.display='flex';
+}
+document.getElementById('photoStartUploadBtn').addEventListener('click',function(){
+  if(!_selectedPhoto)return;
+  document.getElementById('photoSelected').style.display='none';
+  handlePhotoFile(_selectedPhoto);
+  _selectedPhoto=null;
 });
 
 function fmtSize(bytes){
@@ -1387,10 +1707,12 @@ document.getElementById('photoCopyBtn').addEventListener('click',function(){
 document.getElementById('photoAnotherBtn').addEventListener('click',function(){
   document.getElementById('photoResult').classList.remove('show');
   document.getElementById('photoProgress').classList.remove('show');
+  document.getElementById('photoSelected').style.display='none';
   var bf=document.getElementById('photoBarFill');
   bf.style.transition='none';bf.style.width='0%';
   photoZone.style.display='';
   photoInput.value='';
+  _selectedPhoto=null;
 });
 
 // ── DELETE ARTICLE / FOLDER MODALS ──

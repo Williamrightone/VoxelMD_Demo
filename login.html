@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VoxelMD — Sign in</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -136,8 +137,24 @@ body {
 }
 .lp-feature-dot svg { width: 14px; height: 14px; color: var(--teal); }
 .lp-feature-body {}
-.lp-feature-title { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.85); margin-bottom: 2px; }
+.lp-feature-title {
+  font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.85);
+  margin-bottom: 2px; display: flex; align-items: center; gap: 8px;
+}
 .lp-feature-desc { font-size: 12px; color: rgba(255,255,255,0.38); line-height: 1.5; }
+.lp-feature-badge {
+  font-size: 9.5px; font-weight: 500; letter-spacing: 0.4px;
+  text-transform: uppercase; padding: 2px 7px; border-radius: 999px;
+  background: rgba(254,188,46,0.12); color: rgba(254,188,46,0.92);
+  border: 1px solid rgba(254,188,46,0.28); line-height: 1;
+}
+.lp-feature--upcoming .lp-feature-dot {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.08);
+}
+.lp-feature--upcoming .lp-feature-dot svg { color: rgba(255,255,255,0.5); }
+.lp-feature--upcoming .lp-feature-title { color: rgba(255,255,255,0.62); }
+.lp-feature--upcoming .lp-feature-desc { color: rgba(255,255,255,0.3); }
 
 /* ── RIGHT PANEL ── */
 .right-panel {
@@ -352,6 +369,25 @@ body {
   font-size: 13px; color: var(--text-2); line-height: 1.55;
   margin-bottom: 20px;
 }
+.modal-box--wide { max-width: 420px; }
+.beta-notice {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 10px 12px; margin-bottom: 14px;
+  background: #fff8e1; border: 1px solid #f1d28a;
+  border-radius: var(--radius); font-size: 12px; line-height: 1.45;
+  color: #6b5500;
+}
+.beta-notice svg {
+  width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px;
+  color: #b08700;
+}
+.form-input:disabled {
+  background: var(--surface2); color: var(--text-3); cursor: not-allowed;
+}
+.pw-toggle:disabled { cursor: not-allowed; opacity: 0.5; }
+.modal-footer-note {
+  text-align: center; font-size: 13px; color: var(--text-3); margin-top: 16px;
+}
 .modal-form-group { margin-bottom: 16px; }
 .modal-submit {
   width: 100%;
@@ -406,11 +442,11 @@ body {
     </div>
     <div class="lp-feature">
       <div class="lp-feature-dot">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="4" width="13" height="8" rx="1.2"/><path d="M4 10V6l1.5 2L7 6v4" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.5 6v4M9 9l1.5 1.4L12 9" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <div class="lp-feature-body">
-        <div class="lp-feature-title">Compare & improve</div>
-        <div class="lp-feature-desc">Record yourself and replay alongside the AI reader to spot differences</div>
+        <div class="lp-feature-title">Markdown management</div>
+        <div class="lp-feature-desc">Organize articles into workspaces and folders, with version-aware TTS caching</div>
       </div>
     </div>
     <div class="lp-feature">
@@ -420,6 +456,18 @@ body {
       <div class="lp-feature-body">
         <div class="lp-feature-title">Smart vocabulary</div>
         <div class="lp-feature-desc">Select any word in the preview to save it with phonetics to your dictionary</div>
+      </div>
+    </div>
+    <div class="lp-feature lp-feature--upcoming">
+      <div class="lp-feature-dot">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="8" r="3.5"/><circle cx="10" cy="8" r="3.5"/></svg>
+      </div>
+      <div class="lp-feature-body">
+        <div class="lp-feature-title">
+          Compare &amp; improve
+          <span class="lp-feature-badge">Upcoming</span>
+        </div>
+        <div class="lp-feature-desc">Replay your recording alongside the AI reader to spot differences</div>
       </div>
     </div>
   </div>
@@ -499,21 +547,80 @@ body {
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>
       </button>
     </div>
+    <div class="beta-notice" role="status">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="5" x2="8" y2="9"/><circle cx="8" cy="11.2" r="0.6" fill="currentColor" stroke="none"/></svg>
+      <span>This feature isn't available in the Beta release. Password reset will be enabled in a future update.</span>
+    </div>
     <p class="modal-desc">Enter your account email and we'll send you a link to reset your password.</p>
     <form id="forgotForm" novalidate>
       <div class="modal-form-group">
         <label class="form-label" for="forgotEmail">Email address</label>
         <div class="input-wrap">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="3" width="14" height="10" rx="1.5"/><polyline points="1,4 8,9 15,4"/></svg>
-          <input type="email" id="forgotEmail" class="form-input" placeholder="you@example.com" autocomplete="email">
+          <input type="email" id="forgotEmail" class="form-input" placeholder="you@example.com" autocomplete="email" disabled>
         </div>
-        <div class="error-msg" id="forgotEmailError">Please enter a valid email address.</div>
       </div>
-      <button type="submit" class="modal-submit" id="forgotSubmitBtn">
-        <div class="btn-spinner"></div>
+      <button type="submit" class="modal-submit" id="forgotSubmitBtn" disabled>
         <span class="btn-label">Send reset link</span>
       </button>
     </form>
+  </div>
+</div>
+
+<!-- ── REGISTER MODAL ── -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal-box modal-box--wide">
+    <div class="modal-header">
+      <h3>Create your account</h3>
+      <button class="modal-close" id="registerModalClose" aria-label="Close">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>
+      </button>
+    </div>
+    <div class="beta-notice" role="status">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="5" x2="8" y2="9"/><circle cx="8" cy="11.2" r="0.6" fill="currentColor" stroke="none"/></svg>
+      <span>This feature isn't available in the Beta release. Self-serve registration will be enabled in a future update.</span>
+    </div>
+    <p class="modal-desc">Join VoxelMD and start improving your English speaking skills today.</p>
+    <form id="registerForm" novalidate>
+      <div class="modal-form-group">
+        <label class="form-label" for="regName">Display name</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+          <input type="text" id="regName" class="form-input" placeholder="Your name" autocomplete="name" disabled>
+        </div>
+      </div>
+      <div class="modal-form-group">
+        <label class="form-label" for="regEmail">Email address</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="3" width="14" height="10" rx="1.5"/><polyline points="1,4 8,9 15,4"/></svg>
+          <input type="email" id="regEmail" class="form-input" placeholder="you@example.com" autocomplete="email" disabled>
+        </div>
+      </div>
+      <div class="modal-form-group">
+        <label class="form-label" for="regPassword">Password</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="7" width="12" height="8" rx="1.5"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
+          <input type="password" id="regPassword" class="form-input" placeholder="At least 8 characters" autocomplete="new-password" style="padding-right:40px" disabled>
+          <button type="button" class="pw-toggle" disabled>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="modal-form-group">
+        <label class="form-label" for="regConfirm">Confirm password</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="7" width="12" height="8" rx="1.5"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
+          <input type="password" id="regConfirm" class="form-input" placeholder="Repeat password" autocomplete="new-password" disabled>
+        </div>
+      </div>
+      <button type="submit" class="modal-submit" disabled>
+        <span class="btn-label">Create account</span>
+      </button>
+    </form>
+    <div class="modal-footer-note">
+      Already have an account?
+      <a href="#" class="signup-link" id="registerBackToLogin">Sign in</a>
+    </div>
   </div>
 </div>
 
@@ -538,22 +645,12 @@ document.getElementById('pwToggle').addEventListener('click', function() {
     : '<path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/>';
 });
 
-// OAuth buttons
-function oauthLogin(btnId, name, email) {
-  var btn = document.getElementById(btnId);
-  btn.classList.add('loading');
-  btn.disabled = true;
-  document.getElementById(btnId === 'googleBtn' ? 'facebookBtn' : 'googleBtn').disabled = true;
-  setTimeout(function() {
-    doLogin(name, email);
-  }, 900);
+// OAuth buttons — disabled in Beta, show toast only
+function handleOAuth() {
+  showToast('OAuth login is in Beta and not available yet. Please use email and password for now.');
 }
-document.getElementById('googleBtn').addEventListener('click', function() {
-  oauthLogin('googleBtn', 'Demo User', 'demo@gmail.com');
-});
-document.getElementById('facebookBtn').addEventListener('click', function() {
-  oauthLogin('facebookBtn', 'Demo User', 'demo@facebook.com');
-});
+document.getElementById('googleBtn').addEventListener('click', handleOAuth);
+document.getElementById('facebookBtn').addEventListener('click', handleOAuth);
 
 function doLogin(name, email) {
   localStorage.setItem('voxelUser', JSON.stringify({ name: name, email: email }));
@@ -616,31 +713,37 @@ forgotModal.addEventListener('click', function(e) {
   if (e.target === forgotModal) closeForgotModal();
 });
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && forgotModal.classList.contains('open')) closeForgotModal();
+  if (e.key !== 'Escape') return;
+  if (forgotModal.classList.contains('open')) closeForgotModal();
+  else if (registerModal.classList.contains('open')) closeRegisterModal();
 });
+// Forgot form submit is disabled in Beta — no-op
 document.getElementById('forgotForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  var email = document.getElementById('forgotEmail').value.trim();
-  document.getElementById('forgotEmail').classList.remove('error');
-  document.getElementById('forgotEmailError').classList.remove('show');
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    document.getElementById('forgotEmail').classList.add('error');
-    document.getElementById('forgotEmailError').classList.add('show');
-    return;
-  }
-  var btn = document.getElementById('forgotSubmitBtn');
-  btn.classList.add('loading');
-  btn.disabled = true;
-  setTimeout(function() {
-    btn.classList.remove('loading');
-    btn.disabled = false;
-    closeForgotModal();
-    showToast('Reset link sent to ' + email);
-  }, 1200);
 });
+
+// Register modal — disabled in Beta
+var registerModal = document.getElementById('registerModal');
+function openRegisterModal() {
+  registerModal.classList.add('open');
+}
+function closeRegisterModal() {
+  registerModal.classList.remove('open');
+}
 document.getElementById('signupLink').addEventListener('click', function(e) {
   e.preventDefault();
-  showToast('Sign-up coming soon! (demo)');
+  openRegisterModal();
+});
+document.getElementById('registerModalClose').addEventListener('click', closeRegisterModal);
+document.getElementById('registerBackToLogin').addEventListener('click', function(e) {
+  e.preventDefault();
+  closeRegisterModal();
+});
+registerModal.addEventListener('click', function(e) {
+  if (e.target === registerModal) closeRegisterModal();
+});
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+  e.preventDefault();
 });
 </script>
 </body>

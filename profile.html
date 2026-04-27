@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VoxelMD — Profile</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <script>if(localStorage.getItem('voxelTheme')==='dark')document.documentElement.className='dark';</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -351,11 +352,11 @@ html.dark .bug-textarea:focus { background: var(--surface); }
     </div>
     <div class="card-body">
 
-      <div class="plan-badge">
+      <div class="plan-badge" id="planBadge">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
           <polygon points="8,1 10,6 15,6 11,9.5 12.5,15 8,12 3.5,15 5,9.5 1,6 6,6"/>
         </svg>
-        Free Plan
+        <span id="planBadgeLabel">Free Plan</span>
       </div>
 
       <div class="plan-limits">
@@ -505,8 +506,21 @@ function toast(msg) {
   setTimeout(function() { el.classList.remove('show'); }, 2400);
 }
 
+// ── PLAN ──
+function planLabel(plan) {
+  var p = (plan || 'free').toLowerCase();
+  if (p === 'pro') return 'Pro Plan';
+  if (p === 'max') return 'Max Plan';
+  return 'Free Plan';
+}
+
 // ── USAGE ──
 function loadUsage() {
+  // Plan label — from voxelUser
+  var userRaw = localStorage.getItem('voxelUser');
+  var u = userRaw ? JSON.parse(userRaw) : {};
+  document.getElementById('planBadgeLabel').textContent = planLabel(u.plan);
+
   // Workspaces — from voxelWorkspaces (saved by home.html)
   var wsRaw = localStorage.getItem('voxelWorkspaces');
   var wsCount = wsRaw ? JSON.parse(wsRaw).length : 0;
@@ -612,11 +626,16 @@ document.getElementById('profileName').addEventListener('input', function() {
 document.getElementById('saveProfileBtn').addEventListener('click', function() {
   var newName = document.getElementById('profileName').value.trim();
   if (!newName) { toast('Display name cannot be empty'); return; }
-  user.name = newName;
-  localStorage.setItem('voxelUser', JSON.stringify(user));
-  renderAvatar();
-  this.disabled = true;
-  toast('Profile saved');
+  var btn = this;
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+  setTimeout(function() {
+    user.name = newName;
+    localStorage.setItem('voxelUser', JSON.stringify(user));
+    renderAvatar();
+    btn.textContent = 'Save Changes';
+    toast('Profile saved');
+  }, 600);
 });
 
 // ── BACK ──
@@ -628,8 +647,15 @@ document.getElementById('backBtn').addEventListener('click', function() {
 document.getElementById('bugSubmitBtn').addEventListener('click', function() {
   var msg = document.getElementById('bugTextarea').value.trim();
   if (!msg) { toast('Please describe the issue before sending'); return; }
-  document.getElementById('bugTextarea').value = '';
-  toast('Feedback sent — thank you!');
+  var btn = this;
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+  setTimeout(function() {
+    document.getElementById('bugTextarea').value = '';
+    btn.textContent = 'Send Feedback';
+    btn.disabled = false;
+    toast('Feedback sent — thank you!');
+  }, 700);
 });
 </script>
 </body>
